@@ -18,7 +18,7 @@
     "description": "Wild-caught salmon smoked on a cedar plank with a maple-dijon glaze.",
     "price": 38,
     "category": "From the Hearth",
-    "available": true
+    "available": false
   },
   {
     "name": "Deconstructed Tiramisu",
