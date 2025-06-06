@@ -1,14 +1,14 @@
 {
   "name": "virundhumane-backend",
   "version": "1.0.0",
-  "description": "Serverless functions for the restaurant website",
-  "main": "index.js",
+  "description": "Website for Virundhu Mane",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tailwindcss -i ./src/input.css -o ./public/css/style.css"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@octokit/rest": "^18.12.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
   }
 }
