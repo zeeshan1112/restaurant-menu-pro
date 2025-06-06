@@ -1,53 +1,42 @@
-/* /js/main.js */
-
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  const menuContainer = document.getElementById('menu-container');
+  try {
+    const response = await fetch('/.netlify/functions/menu');
+    const menuItems = await response.json();
     
-    /**
-     * Intersection Observer to fade in menu items on scroll.
-     * This adds a modern, dynamic feel to the page as the user explores the menu.
-     */
-    const menuItems = document.querySelectorAll('.menu-item');
+    // Group items by category
+    const menuByCategory = menuItems.reduce((acc, item) => {
+      (acc[item.category] = acc[item.category] || []).push(item);
+      return acc;
+    }, {});
 
-    const observerOptions = {
-        root: null, // observes intersections relative to the viewport
-        rootMargin: '0px',
-        threshold: 0.1 // Triggers when 10% of the item is visible
-    };
+    menuContainer.innerHTML = ''; // Clear any loading message
 
-    const observer = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            // If the element is intersecting (visible)
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                // Stop observing the element once it's visible
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
+    // Render each category and its items
+    for (const category in menuByCategory) {
+      const categorySection = document.createElement('section');
+      categorySection.className = 'menu-category';
+      categorySection.innerHTML = `<h2>${category}</h2>`;
 
-    // Attach the observer to each menu item
-    menuItems.forEach(item => {
-        observer.observe(item);
-    });
+      const grid = document.createElement('div');
+      grid.className = 'menu-grid';
 
-    /**
-     * Future functionality could be added here.
-     * For example:
-     * * 1. Fetching menu from an API:
-     * fetch('/api/menu')
-     * .then(response => response.json())
-     * .then(data => {
-     * // Code to dynamically generate menu items
-     * });
-     * * 2. Client-side filtering:
-     * const filterButtons = document.querySelectorAll('.filter-btn');
-     * filterButtons.forEach(button => {
-     * button.addEventListener('click', () => {
-     * // Code to show/hide menu items based on category (e.g., 'veg', 'non-veg')
-     * });
-     * });
-     */
+      menuByCategory[category].forEach(item => {
+        const card = document.createElement('div');
+        card.className = `menu-card ${!item.available ? 'unavailable' : ''}`;
+        card.innerHTML = `
+          <span class="price">$${item.price.toFixed(2)}</span>
+          <h3>${item.name}</h3>
+          <p>${item.description}</p>
+          ${!item.available ? '<div class="unavailable-tag">SOLD OUT</div>' : ''}
+        `;
+        grid.appendChild(card);
+      });
 
-    console.log("Virundhu Mane interactive menu loaded.");
-
+      categorySection.appendChild(grid);
+      menuContainer.appendChild(categorySection);
+    }
+  } catch (error) {
+    menuContainer.innerHTML = '<p>We are currently updating our menu. Please check back shortly.</p>';
+  }
 });
