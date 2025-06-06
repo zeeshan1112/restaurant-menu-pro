@@ -11,7 +11,7 @@
     "description": "Tender octopus with fingerling potatoes, chorizo, and a saffron aioli.",
     "price": 22,
     "category": "Starters",
-    "available": false
+    "available": true
   },
   {
     "name": "Cedar Plank Salmon",
