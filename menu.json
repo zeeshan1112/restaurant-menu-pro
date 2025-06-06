@@ -1,0 +1,7 @@
+[
+  { "name": "Smoked Burrata", "description": "Creamy burrata with grilled peaches, prosciutto, and a balsamic glaze.", "price": 18.00, "category": "Starters", "available": true },
+  { "name": "Charred Octopus", "description": "Tender octopus with fingerling potatoes, chorizo, and a saffron aioli.", "price": 22.00, "category": "Starters", "available": false },
+  { "name": "Dry-Aged Ribeye", "description": "16oz bone-in ribeye, served with smoked garlic butter and sea salt.", "price": 65.00, "category": "From the Hearth", "available": true },
+  { "name": "Cedar Plank Salmon", "description": "Wild-caught salmon smoked on a cedar plank with a maple-dijon glaze.", "price": 38.00, "category": "From the Hearth", "available": true },
+  { "name": "Deconstructed Tiramisu", "description": "Mascarpone mousse, espresso-soaked ladyfinger crisps, and cocoa dust.", "price": 14.00, "category": "Desserts", "available": true }
+]

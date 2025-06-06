@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ember & Ash - Admin Dashboard</title>
+
+    <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'playfair': ['"Playfair Display"', 'serif'],
+                        'jakarta': ['"Plus Jakarta Sans"', 'sans-serif']
+                    },
+                    colors: {
+                        brand: {
+                            'primary': '#2d3748', // Dark Slate
+                            'secondary': '#a0aec0', // Gray
+                            'accent': '#c53030', // Red Accent
+                            'background': '#f7fafc', // Light Gray BG
+                            'surface': '#ffffff', // White
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Applying base fonts */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+        }
+    </style>
+
+    <!-- Deferred JS -->
+    <script src="/js/admin.js" defer></script>
+</head>
+<body class="text-brand-primary bg-brand-background">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <header class="mb-8 flex justify-between items-center">
+            <h1 class="text-4xl font-playfair">Ember & Ash</h1>
+            <h2 class="text-2xl sm:text-3xl font-playfair">Menu Management</h2>
+        </header>
+
+        <main class="space-y-12">
+            <!-- This section will be populated by admin.js -->
+            <div id="admin-menu-list" class="space-y-4">
+                <!-- Example of a dynamically generated item -->
+                <div class="bg-brand-surface p-4 rounded-lg shadow-md flex items-center justify-between">
+                    <div>
+                        <p class="font-bold text-lg">Smoked Brisket</p>
+                        <p class="text-sm text-brand-secondary">12-hour smoked, with our signature rub.</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <p class="font-semibold">$24.99</p>
+                        <span class="text-xs font-medium bg-red-100 text-red-800 px-2 py-1 rounded-full">BBQ</span>
+                        <button class="text-red-500 hover:text-red-700">Remove</button>
+                    </div>
+                </div>
+                 <div class="bg-brand-surface p-4 rounded-lg shadow-md flex items-center justify-between">
+                    <div>
+                        <p class="font-bold text-lg">Cedar Plank Salmon</p>
+                        <p class="text-sm text-brand-secondary">Fresh Atlantic salmon smoked on a cedar plank.</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <p class="font-semibold">$28.50</p>
+                        <span class="text-xs font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Seafood</span>
+                        <button class="text-red-500 hover:text-red-700">Remove</button>
+                    </div>
+                </div>
+            </div>
+
+            <button id="save-all-changes" class="w-full bg-brand-accent text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-red-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-accent">
+                Publish All Changes
+            </button>
+
+            <!-- Add New Item Section -->
+            <div class="bg-brand-surface p-6 sm:p-8 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-playfair mb-6 border-b pb-4">Add New Item</h3>
+                
+                <form id="add-item-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Item Name -->
+                        <div>
+                            <label for="item-name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                            <input type="text" id="item-name" name="name" placeholder="e.g., Pulled Pork Sandwich" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brand-accent focus:border-brand-accent transition">
+                        </div>
+                        
+                        <!-- Item Category -->
+                        <div>
+                           <label for="item-category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                            <input type="text" id="item-category" name="category" placeholder="e.g., Sandwiches" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brand-accent focus:border-brand-accent transition">
+                        </div>
+                    </div>
+                    
+                    <!-- Item Description -->
+                    <div>
+                        <label for="item-description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea id="item-description" name="description" placeholder="e.g., Slow-smoked pork on a brioche bun with coleslaw" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brand-accent focus:border-brand-accent transition"></textarea>
+                    </div>
+                    
+                    <!-- Item Price -->
+                    <div>
+                        <label for="item-price" class="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                        <input type="text" id="item-price" name="price" placeholder="e.g., 15.99" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brand-accent focus:border-brand-accent transition">
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="pt-4">
+                        <button type="submit" class="w-full sm:w-auto bg-brand-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-800 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary">
+                            Add Item to Menu
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+    </div>
+
+</body>
+</html>
