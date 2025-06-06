@@ -28,21 +28,36 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- RENDER FUNCTION ---
   // Redraws the entire list of editable menu items
   const renderAdminMenu = () => {
-    adminMenuList.innerHTML = '';
-    menuData.forEach((item, index) => {
-      const itemDiv = document.createElement('div');
-      itemDiv.className = 'admin-item';
-      itemDiv.innerHTML = `
-        <input type="text" value="${item.name}" data-index="${index}" data-field="name" placeholder="Name">
-        <input type="text" value="${item.category}" data-index="${index}" data-field="category" placeholder="Category">
-        <input type="number" step="0.01" value="${item.price}" data-index="${index}" data-field="price" placeholder="Price">
-        <label><input type="checkbox" ${item.available ? 'checked' : ''} data-index="${index}" data-field="available"> Available</label>
-        <button class="delete-btn" data-index="${index}">Delete</button>
-      `;
-      // Note: We don't show the long description here to keep the UI clean, but it's still saved.
-      adminMenuList.appendChild(itemDiv);
-    });
-  };
+        adminMenuList.innerHTML = '';
+        menuData.forEach((item, index) => {
+            const itemDiv = document.createElement('div');
+            // This styles the container for each row.
+            itemDiv.className = 'grid grid-cols-1 md:grid-cols-5 gap-4 items-center border-b border-gray-200 py-4';
+
+            // This is the new, fully styled HTML that will be generated for each item.
+            itemDiv.innerHTML = `
+                <input type="text" value="<span class="math-inline">\{item\.name\}" data\-index\="</span>{index}" data-field="name" placeholder="Name"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-brand-accent focus:border-brand-accent transition">
+
+                <input type="text" value="<span class="math-inline">\{item\.category\}" data\-index\="</span>{index}" data-field="category" placeholder="Category"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-brand-accent focus:border-brand-accent transition">
+
+                <input type="number" step="0.01" value="<span class="math-inline">\{item\.price\}" data\-index\="</span>{index}" data-field="price" placeholder="Price"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-brand-accent focus:border-brand-accent transition">
+
+                <label class="flex items-center justify-start space-x-2 cursor-pointer">
+                    <input type="checkbox" <span class="math-inline">\{item\.available ? 'checked' \: ''\} data\-index\="</span>{index}" data-field="available"
+                        class="h-5 w-5 rounded border-gray-300 text-brand-primary focus:ring-brand-primary">
+                    <span class="text-sm font-medium text-gray-700">Available</span>
+                </label>
+
+                <button class="delete-btn bg-gray-700 text-white text-xs font-bold uppercase px-3 py-2 rounded-md hover:bg-black transition-colors" data-index="${index}">
+                    Delete
+                </button>
+            `;
+            adminMenuList.appendChild(itemDiv);
+        });
+    };
 
   // --- DATA FUNCTIONS ---
   // Fetches the latest menu from the server
