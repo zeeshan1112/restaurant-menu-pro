@@ -26,5 +26,12 @@
     "price": 14,
     "category": "Desserts",
     "available": true
+  },
+  {
+    "name": "Chicken Biryani",
+    "description": "",
+    "price": 120,
+    "category": "Main Course",
+    "available": true
   }
 ]
