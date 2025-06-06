@@ -64,9 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Listens for any change in the item list (e.g., typing in a box, checking a box)
   adminMenuList.addEventListener('change', (e) => {
     const index = e.target.dataset.index;
-    if (!index) return;
+    if (index === undefined) return; // Exit if the change wasn't on a menu item input
+    
     const field = e.target.dataset.field;
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.type === 'number' ? parseFloat(e.target.value) : e.target.value;
+    
     menuData[index][field] = value; // Update the data in our local array
   });
 
@@ -85,11 +87,21 @@ document.addEventListener('DOMContentLoaded', () => {
   addItemForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const form = e.target;
+    const newName = form.querySelector('[placeholder="Name"]').value;
+    const newDescription = form.querySelector('[placeholder="Description"]').value;
+    const newPrice = parseFloat(form.querySelector('[placeholder="Price"]').value);
+    const newCategory = form.querySelector('[placeholder="Category"]').value;
+
+    if (!newName || !newDescription || isNaN(newPrice) || !newCategory) {
+        alert('Please fill out all fields to add an item.');
+        return;
+    }
+
     menuData.push({
-      name: form.name.value,
-      description: form.description.value,
-      price: parseFloat(form.price.value),
-      category: form.category.value,
+      name: newName,
+      description: newDescription,
+      price: newPrice,
+      category: newCategory,
       available: true, // New items are always available by default
     });
     renderAdminMenu(); // Redraw the list with the new item
