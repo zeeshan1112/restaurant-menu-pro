@@ -28,36 +28,36 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- RENDER FUNCTION ---
   // Redraws the entire list of editable menu items
   const renderAdminMenu = () => {
-        adminMenuList.innerHTML = '';
-        menuData.forEach((item, index) => {
-            const itemDiv = document.createElement('div');
-            // This styles the container for each row.
-            itemDiv.className = 'grid grid-cols-1 md:grid-cols-5 gap-4 items-center border-b border-gray-200 py-4';
+    adminMenuList.innerHTML = '';
+    menuData.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        // This styles the container for each row.
+        itemDiv.className = 'grid grid-cols-1 md:grid-cols-5 gap-4 items-center border-b border-gray-200 py-4';
 
-            // This is the new, fully styled HTML that will be generated for each item.
-            itemDiv.innerHTML = `
-                <input type="text" value="<span class="math-inline">\{item\.name\}" data\-index\="</span>{index}" data-field="name" placeholder="Name"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-brand-accent focus:border-brand-accent transition">
+        // This is the new, fully styled HTML that will be generated for each item.
+        itemDiv.innerHTML = `
+            <input type="text" value="${item.name}" data-index="${index}" data-field="name" placeholder="Name"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-brand-accent focus:border-brand-accent transition">
 
-                <input type="text" value="<span class="math-inline">\{item\.category\}" data\-index\="</span>{index}" data-field="category" placeholder="Category"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-brand-accent focus:border-brand-accent transition">
+            <input type="text" value="${item.category}" data-index="${index}" data-field="category" placeholder="Category"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-brand-accent focus:border-brand-accent transition">
 
-                <input type="number" step="0.01" value="<span class="math-inline">\{item\.price\}" data\-index\="</span>{index}" data-field="price" placeholder="Price"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-brand-accent focus:border-brand-accent transition">
-
-                <label class="flex items-center justify-start space-x-2 cursor-pointer">
-                    <input type="checkbox" <span class="math-inline">\{item\.available ? 'checked' \: ''\} data\-index\="</span>{index}" data-field="available"
-                        class="h-5 w-5 rounded border-gray-300 text-brand-primary focus:ring-brand-primary">
-                    <span class="text-sm font-medium text-gray-700">Available</span>
-                </label>
-
-                <button class="delete-btn bg-gray-700 text-white text-xs font-bold uppercase px-3 py-2 rounded-md hover:bg-black transition-colors" data-index="${index}">
-                    Delete
-                </button>
-            `;
-            adminMenuList.appendChild(itemDiv);
-        });
-    };
+            <input type="number" step="0.01" value="${item.price}" data-index="${index}" data-field="price" placeholder="Price"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-brand-accent focus:border-brand-accent transition">
+            
+            <label class="flex items-center justify-start space-x-2 cursor-pointer">
+                <input type="checkbox" ${item.available ? 'checked' : ''} data-index="${index}" data-field="available"
+                       class="h-5 w-5 rounded border-gray-300 text-brand-primary focus:ring-brand-primary">
+                <span class="text-sm font-medium text-gray-700">Available</span>
+            </label>
+            
+            <button class="delete-btn bg-gray-700 text-white text-xs font-bold uppercase px-3 py-2 rounded-md hover:bg-black transition-colors" data-index="${index}">
+                Delete
+            </button>
+        `;
+        adminMenuList.appendChild(itemDiv);
+    });
+  };
 
   // --- DATA FUNCTIONS ---
   // Fetches the latest menu from the server
@@ -67,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
       menuData = await response.json();
       renderAdminMenu();
     } catch (error) { 
+      console.error("Failed to load menu:", error);
       adminMenuList.innerHTML = '<p>Could not load menu data. Please refresh.</p>'; 
     }
   };
@@ -115,13 +116,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Listens for the "Add Item" form submission
   addItemForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const form = e.target;
-    const newName = form.querySelector('[placeholder="Name"]').value;
-    const newDescription = form.querySelector('[placeholder="Description"]').value;
-    const newPrice = parseFloat(form.querySelector('[placeholder="Price"]').value);
-    const newCategory = form.querySelector('[placeholder="Category"]').value;
+    
+    // Get values directly from the form inputs by their ID
+    const newName = document.getElementById('item-name').value;
+    const newCategory = document.getElementById('item-category').value;
+    const newDescription = document.getElementById('item-description').value;
+    const newPrice = parseFloat(document.getElementById('item-price').value);
 
-    if (!newName || !newDescription || isNaN(newPrice) || !newCategory) {
+    // Validate that all fields are filled correctly
+    if (!newName || !newCategory || !newDescription || isNaN(newPrice)) {
         alert('Please fill out all fields to add an item.');
         return;
     }
@@ -133,8 +136,9 @@ document.addEventListener('DOMContentLoaded', () => {
       category: newCategory,
       available: true, // New items are always available by default
     });
+
     renderAdminMenu(); // Redraw the list with the new item
-    form.reset(); // Clear the form fields
+    e.target.reset(); // Clear the form fields
   });
   
   // Listens for clicks on the main "Save" button
