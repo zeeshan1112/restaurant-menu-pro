@@ -11,6 +11,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const addItemForm = document.getElementById('add-item-form');
   let menuData = []; // This array will hold the menu items in the browser's memory
 
+  // --- LOGOUT LOGIC ---
+  // Find the new logout button by its ID
+  const logoutButton = document.getElementById('logout-button');
+
+  // Add a click listener to the button
+  logoutButton.addEventListener('click', () => {
+      // 1. Remove the authentication flag from the browser's session storage
+      sessionStorage.removeItem('isAdminAuthenticated');
+
+      // 2. Redirect the user back to the login page
+      alert('You have been logged out.');
+      window.location.href = '/login.html';
+  });
+
   // --- RENDER FUNCTION ---
   // Redraws the entire list of editable menu items
   const renderAdminMenu = () => {
