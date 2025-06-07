@@ -1,0 +1,14 @@
+# This is the main build configuration for Netlify's cloud servers
+[build]
+  # This is the folder that Netlify will deploy. It should match your UI settings.
+  publish = "public"
+  # This is the command Netlify will run to build your site when you deploy.
+  command = "npm run build"
+
+# This section specifically configures your LOCAL `netlify dev` server
+[dev]
+  # This tells `netlify dev` to run the "dev" script from your package.json,
+  # which includes the --watch flag for live updates. This is the key fix.
+  command = "npm run dev"
+  # This tells the dev server which folder to serve the static files from.
+  publish = "public"
