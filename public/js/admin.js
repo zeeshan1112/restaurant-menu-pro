@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // Get references to all interactive elements on the page
   const adminMenuList = document.getElementById('admin-menu-list');
   const saveAllButton = document.getElementById('save-all-changes');
   const addItemForm = document.getElementById('add-item-form');
@@ -14,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const categoryListDiv = document.getElementById('category-list');
   const addItemCategorySelect = document.getElementById('item-category-select');
 
-  // In-memory data stores
   let menuData = [];
   let categoriesData = [];
 
@@ -26,12 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --- HELPER & RENDER FUNCTIONS ---
-
-  /**
-   * Populates any <select> dropdown with the current list of categories.
-   * @param {HTMLSelectElement} selectElement The dropdown element to populate.
-   * @param {string} [selectedValue] The value that should be pre-selected.
-   */
   const populateCategoryDropdown = (selectElement, selectedValue) => {
     selectElement.innerHTML = '';
     categoriesData.forEach(category => {
@@ -45,25 +37,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  /**
-   * Renders the simple text list of existing categories.
-   */
+  // --- NEW: This function now adds a delete button next to each category ---
   const renderCategoryList = () => {
-    categoryListDiv.innerHTML = categoriesData.map(cat => `<p class="py-1">${cat}</p>`).join('');
-    // Also update the main dropdown in the "Add Item" form
+    categoryListDiv.innerHTML = '';
+    categoriesData.forEach(category => {
+      const categoryItemDiv = document.createElement('div');
+      categoryItemDiv.className = 'flex items-center justify-between py-1';
+      categoryItemDiv.innerHTML = `
+        <span>${category}</span>
+        <button data-category-name="${category}" class="delete-category-btn text-red-500 hover:text-red-700 text-xs font-semibold">Remove</button>
+      `;
+      categoryListDiv.appendChild(categoryItemDiv);
+    });
     populateCategoryDropdown(addItemCategorySelect);
   };
 
-  /**
-   * Redraws the entire list of editable menu items.
-   */
   const renderAdminMenu = () => {
     adminMenuList.innerHTML = '';
     menuData.forEach((item, index) => {
       const itemDiv = document.createElement('div');
       itemDiv.className = 'grid grid-cols-1 md:grid-cols-5 gap-4 items-center border-b border-gray-200 py-4';
-
-      // Create each input element individually for clarity and to attach event listeners if needed
+      
       const nameInput = document.createElement('input');
       nameInput.type = 'text';
       nameInput.value = item.name;
@@ -96,23 +90,16 @@ document.addEventListener('DOMContentLoaded', () => {
       deleteButton.dataset.index = index;
       deleteButton.textContent = 'Delete';
 
-      // Append all created elements to the row
       itemDiv.appendChild(nameInput);
       itemDiv.appendChild(categorySelect);
       itemDiv.appendChild(priceInput);
       itemDiv.appendChild(availableLabel);
       itemDiv.appendChild(deleteButton);
-      
       adminMenuList.appendChild(itemDiv);
     });
   };
 
   // --- DATA HANDLING & API FUNCTIONS ---
-
-  /**
-   * A generic function to save data ('menu' or 'categories') to the server.
-   * @param {'menu' | 'categories'} dataType The type of data to save.
-   */
   const saveData = async (dataType) => {
     const isMenu = dataType === 'menu';
     const endpoint = isMenu ? '/.netlify/functions/menu' : '/.netlify/functions/categories';
@@ -139,22 +126,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  /**
-   * Loads both menu and category data when the page first opens.
-   */
   const loadInitialData = async () => {
     try {
       const [menuResponse, categoriesResponse] = await Promise.all([
         fetch('/.netlify/functions/menu'),
         fetch('/.netlify/functions/categories')
       ]);
-
       if (!menuResponse.ok) throw new Error('Failed to fetch menu.');
       if (!categoriesResponse.ok) throw new Error('Failed to fetch categories.');
-
       menuData = await menuResponse.json();
       categoriesData = await categoriesResponse.json();
-
       renderCategoryList();
       renderAdminMenu();
     } catch (error) {
@@ -164,19 +145,14 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // --- EVENT LISTENERS ---
-
-  // Listens for any change in the item list (typing, checking a box, changing a dropdown)
   adminMenuList.addEventListener('change', (e) => {
     const index = e.target.dataset.index;
     if (index === undefined) return;
-    
     const field = e.target.dataset.field;
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.type === 'number' ? parseFloat(e.target.value) : e.target.value;
-    
     menuData[index][field] = value;
   });
 
-  // Listens for clicks on delete buttons
   adminMenuList.addEventListener('click', (e) => {
     if (e.target.classList.contains('delete-btn')) {
       const index = e.target.dataset.index;
@@ -187,25 +163,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Listens for the "Add Category" form submission
+  // --- NEW: Event listener for deleting a category ---
+  categoryListDiv.addEventListener('click', async (e) => {
+    if (e.target.classList.contains('delete-category-btn')) {
+      const categoryToDelete = e.target.dataset.categoryName;
+      
+      // Prevent deleting a category that is still in use
+      const isCategoryInUse = menuData.some(item => item.category === categoryToDelete);
+      if (isCategoryInUse) {
+        alert(`Cannot delete "${categoryToDelete}" because it is still being used by one or more menu items.`);
+        return;
+      }
+
+      if (confirm(`Are you sure you want to permanently delete the category "${categoryToDelete}"?`)) {
+        // Remove from the local data array
+        categoriesData = categoriesData.filter(cat => cat !== categoryToDelete);
+        // Re-render the UI
+        renderCategoryList();
+        renderAdminMenu();
+        // Save the changes immediately to the server
+        await saveData('categories');
+      }
+    }
+  });
+
   addCategoryForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const newCategoryInput = document.getElementById('new-category-name');
     const newCategory = newCategoryInput.value.trim();
-    
     if (newCategory && !categoriesData.includes(newCategory)) {
       categoriesData.push(newCategory);
       categoriesData.sort();
-      renderCategoryList(); // Update the UI list
-      renderAdminMenu(); // Redraw menu items to include the new category in their dropdowns
-      await saveData('categories'); // Save the new category list to the server immediately
+      renderCategoryList();
+      renderAdminMenu();
+      await saveData('categories');
       newCategoryInput.value = '';
     } else {
       alert('Category cannot be empty or already exists.');
     }
   });
 
-  // Listens for the "Add Item" form submission
   addItemForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const newName = document.getElementById('item-name').value;
@@ -223,7 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
     e.target.reset();
   });
   
-  // Listens for clicks on the main "Publish All Changes" button
   saveAllButton.addEventListener('click', () => saveData('menu'));
 
   // --- INITIALIZE THE PAGE ---
