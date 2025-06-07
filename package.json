@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Website for Virundhu Mane",
   "scripts": {
-    "build": "tailwindcss -i ./src/input.css -o ./public/css/style.css"
+    "build": "tailwindcss -i ./src/input.css -o ./public/css/style.css",
+    "dev": "tailwindcss -i ./src/input.css -o ./public/css/style.css --watch"
   },
   "dependencies": {
     "@octokit/rest": "^18.12.0"
