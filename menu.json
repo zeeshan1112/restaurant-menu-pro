@@ -33,5 +33,12 @@
     "price": 120,
     "category": "Main Course",
     "available": true
+  },
+  {
+    "name": "French fries",
+    "description": "Potato fingers",
+    "price": 99,
+    "category": "Sides",
+    "available": true
   }
 ]
