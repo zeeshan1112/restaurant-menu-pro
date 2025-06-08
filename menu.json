@@ -36,12 +36,12 @@
     "isAvailable": false
   },
   {
-    "name": "Bissibele bath",
-    "description": "xss",
-    "price": 222,
-    "category": "Breakfast",
+    "name": "Chiku",
+    "description": "Chickeesds",
+    "price": 300,
+    "category": "Lunch",
     "isAvailable": true,
-    "isVeg": true,
-    "image": "https://placehold.co/600x400/333333/FBBF24?text=Bissibele%20bath"
+    "isVeg": false,
+    "image": "https://placehold.co/600x400/333333/FBBF24?text=Chiku"
   }
 ]
