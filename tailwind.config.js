@@ -7,16 +7,13 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'playfair': ['"Playfair Display"', 'serif'],
-        'jakarta': ['"Plus Jakarta Sans"', 'sans-serif']
+        'brand': ['"Playfair Display"', 'serif'],
+        'sans': ['"Roboto"', 'sans-serif'],
       },
       colors: {
-        brand: {
-          'primary': '#2d3748', // Dark Slate
-          'secondary': '#a0aec0', // Gray
-          'accent': '#c53030', // Red Accent
-          'background': '#f7fafc', // Light Gray BG
-          'surface': '#ffffff', // White
+        amber: {
+          400: '#FBBF24',
+          500: '#F59E0B',
         }
       }
     },

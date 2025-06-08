@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom component styles for the new design */
+@layer components {
+    .tab-active {
+        @apply bg-amber-400 text-gray-900;
+    }
+    .tab-inactive {
+        @apply bg-gray-700 text-gray-200 hover:bg-gray-600;
+    }
+    .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+}

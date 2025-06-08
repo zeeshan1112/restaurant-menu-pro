@@ -1,41 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virundhu Mane - Artisanal Cuisine</title>
-
+    <title>Virindhu Mane - Flavors of Madurai</title>
+    <link rel="icon" type="image/png" href="/icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="/css/style.css">
 
     <script src="/js/main.js" defer></script>
-
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        h1, h2, h3, h4, h5, h6 { font-family: 'Playfair Display', serif; }
+        /* Base styles are minimal; Tailwind handles the rest */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1a1a1a;
+        }
+        .hero-bg {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
     </style>
 </head>
-<body class="bg-brand-background text-brand-primary">
+<body class="bg-gray-900 text-gray-200">
 
-    <div class="container max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
+    <header id="home" class="hero-bg h-screen flex flex-col items-center justify-center text-center text-white p-4">
+        <h1 class="font-brand text-5xl md:text-8xl font-bold">Virindhu Mane</h1>
+        <p class="mt-4 text-xl md:text-3xl">Flavors of Madurai</p>
+        <a href="#menu" class="mt-8 px-8 py-3 bg-amber-500 text-gray-900 font-bold rounded-lg hover:bg-amber-400 transition-colors duration-300">
+            View Menu
+        </a>
+    </header>
 
-        <header class="text-center my-8 sm:my-12">
-            <h1 class="text-5xl sm:text-7xl font-playfair">Virundhu Mane</h1>
-            <p class="text-lg sm:text-xl text-brand-secondary mt-4">Artisanal Cuisine, Modern Elegance</p>
-        </header>
+    <section id="about" class="py-16 md:py-24 bg-gray-800">
+        <div class="container mx-auto px-6 lg:px-8">
+            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-amber-400">About Us</h2>
+            <div class="mt-8 max-w-3xl mx-auto text-center text-gray-300 space-y-4 leading-relaxed">
+                <p>Welcome to Virindhu Mane, where we bring the authentic, rich, and diverse flavors of Madurai right to your plate. Our culinary journey is a tribute to the legendary hospitality and vibrant food culture of one of Tamil Nadu's most ancient cities.</p>
+            </div>
+        </div>
+    </section>
 
-        <main id="menu-container" class="space-y-12">
-            <p class="text-center text-lg text-brand-secondary">Loading our menu...</p>
-        </main>
+    <main id="menu" class="py-16 md:py-24">
+        <div class="container mx-auto px-6 lg:px-8">
+            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-amber-400">Our Menu</h2>
+            
+            <div class="flex justify-center items-center my-8 space-x-4">
+                 <span class="font-semibold text-lg toggle-label-all">All</span>
+                 <div id="veg-toggle-switch" class="relative w-14 h-8 flex items-center bg-gray-600 rounded-full p-1 cursor-pointer">
+                    <div id="veg-toggle-knob" class="bg-amber-400 w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
+                 </div>
+                 <span class="font-semibold text-lg toggle-label-veg">Veg</span>
+                 <span class="font-semibold text-lg toggle-label-nonveg hidden">Non-Veg</span>
+            </div>
 
-        <footer class="text-center mt-16 text-brand-secondary text-sm">
+            <div id="category-tabs" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-12"></div>
+            <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+            <p id="no-items-message" class="text-center text-gray-400 mt-8 text-xl hidden">No items found matching your selection.</p>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 py-8">
+        <div class="container mx-auto px-6 lg:px-8 text-center text-gray-400">
             <p>&copy; 2025 Virundhu Mane. All Rights Reserved.</p>
-        </footer>
-
-    </div>
+        </div>
+    </footer>
 
 </body>
 </html>

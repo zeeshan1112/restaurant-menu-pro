@@ -1,0 +1,12 @@
+# This is the master instruction manual for Netlify
+
+# Configures the build process for LIVE deploys
+[build]
+  publish = "public"
+  command = "npm run build"
+
+# Specifically configures your LOCAL `netlify dev` server
+[dev]
+  command = "npm run dev"
+  publish = "public"
+  functions = "netlify/functions"
