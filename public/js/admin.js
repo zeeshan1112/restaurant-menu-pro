@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminTabsContainer = document.getElementById('admin-tabs');
 
     // Page-specific elements (will be checked for existence)
+    const toastNotification = document.getElementById('toast-notification');
+    const toastMessage = document.getElementById('toast-message');
+    let toastTimeout;
     const adminMenuList = document.getElementById('admin-menu-list');
     const saveAllButton = document.getElementById('save-all-changes');
     const addItemForm = document.getElementById('add-item-form');
@@ -20,14 +23,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const addItemDietarySelect = document.getElementById('item-dietary-select');
     let menuData = [];
     let categoriesData = [];
+    let isMenuDirty = false;
+    let isCategoriesDirty = false;
 
     // --- COMMON LOGIC (Logout) ---
     if (logoutButton) {
         logoutButton.addEventListener('click', () => {
             sessionStorage.removeItem('isAdminAuthenticated');
-            alert('You have been logged out.');
             window.location.href = '/login.html';
         });
+    }
+
+    // --- PUBLISH BUTTON STATE LOGIC ---
+    const updatePublishButtonState = () => {
+        if (saveAllButton) {
+            if (isMenuDirty || isCategoriesDirty) {
+                saveAllButton.disabled = false;
+                saveAllButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                saveAllButton.disabled = true;
+                saveAllButton.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
     }
 
     // --- TAB NAVIGATION LOGIC ---
@@ -61,6 +78,36 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // --- TOAST NOTIFICATION LOGIC ---
+    const showToast = (message, type = 'info', duration = 3000) => {
+        if (!toastNotification || !toastMessage) return;
+
+        clearTimeout(toastTimeout); // Clear any existing timeout
+
+        toastMessage.textContent = message;
+        toastNotification.classList.remove('bg-green-500', 'bg-red-500', 'bg-blue-500', 'opacity-0', '-translate-y-10', 'pointer-events-none');
+        toastNotification.classList.add('pointer-events-auto');
+
+        if (type === 'success') {
+            toastNotification.classList.add('bg-green-500');
+        } else if (type === 'error') {
+            toastNotification.classList.add('bg-red-500');
+        } else { // info or default
+            toastNotification.classList.add('bg-blue-500');
+        }
+
+        // Animate in
+        toastNotification.classList.remove('opacity-0', '-translate-y-10');
+        toastNotification.classList.add('opacity-100', 'translate-y-0');
+
+        if (duration > 0) {
+            toastTimeout = setTimeout(() => {
+                toastNotification.classList.remove('opacity-100', 'translate-y-0');
+                toastNotification.classList.add('opacity-0', '-translate-y-10', 'pointer-events-none');
+            }, duration);
+        }
+    };
 
     // --- HELPER & RENDER FUNCTIONS ---
     const populateCategoryDropdown = (selectElement, selectedValue) => {
@@ -138,14 +185,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const isMenu = dataType === 'menu';
         const endpoint = isMenu ? '/.netlify/functions/menu' : '/.netlify/functions/categories';
         const dataToSave = isMenu ? menuData : categoriesData;
-        const button = isMenu ? saveAllButton : null;
-        if (button) { button.textContent = 'Saving...'; button.disabled = true; }
+
         try {
             const response = await fetch(endpoint, { method: 'POST', body: JSON.stringify(dataToSave, null, 2) });
-            if (!response.ok) throw new Error(`Failed to save ${dataType}`);
-            if (isMenu) alert('Menu Published Successfully!');
-        } catch (error) { alert(`Error saving ${dataType}. Check console.`); } finally {
-            if (button) { button.textContent = 'Publish All Changes'; button.disabled = false; }
+            if (!response.ok) {
+                const errorData = await response.text(); // Try to get more error info
+                throw new Error(`Failed to save ${dataType}. Server responded with: ${response.status} ${errorData}`);
+            }
+            // Return true on success for the caller to handle overall success message
+            return true; 
+        } catch (error) { 
+            showToast(`Error saving ${dataType}. Check console.`, 'error');
+            console.error(`Error in saveData for ${dataType}:`, error);
+            return false; // Return false on failure
         }
     };
 
@@ -163,13 +215,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (addItemCategorySelect) {
                 populateCategoryDropdown(addItemCategorySelect);
             }
+            isMenuDirty = false; // Reset dirty flags after initial load
+            isCategoriesDirty = false;
+            updatePublishButtonState(); // Set initial state of publish button
 
         } catch (error) {
             const errorDisplayArea = adminMenuList || document.querySelector('main'); // Fallback to main
             if (errorDisplayArea) {
                 errorDisplayArea.innerHTML = `<p class="text-red-600 font-medium col-span-full text-center">Could not load site data: ${error.message}</p>`;
             } else {
-                console.error("Could not load site data:", error.message);
+                showToast(`Could not load site data: ${error.message}`, 'error', 5000);
             }
         }
     };
@@ -187,6 +242,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (field === 'isAvailable' || field === 'isVeg') { value = (e.target.value === 'true'); } 
             else if (e.target.type === 'number') { value = parseFloat(e.target.value); }
             menuData[index][field] = value;
+            isMenuDirty = true;
+            updatePublishButtonState();
         });
 
         adminMenuList.addEventListener('click', (e) => {
@@ -195,6 +252,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (confirm(`Delete "${menuData[index].name}"?`)) {
                     menuData.splice(index, 1);
                     renderAdminMenu();
+                    isMenuDirty = true;
+                    updatePublishButtonState();
                 }
             }
         });
@@ -202,7 +261,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // For Edit Menu Page (edit-menu.html) - Save All Button
     if (saveAllButton) {
-        saveAllButton.addEventListener('click', () => saveData('menu'));
+        saveAllButton.addEventListener('click', async () => {
+            saveAllButton.textContent = 'Publishing...';
+            saveAllButton.disabled = true;
+            let menuSaveSuccess = false;
+            let categorySaveSuccess = false;
+            let overallSuccess = false;
+
+            try {
+                showToast('Publishing menu changes...', 'info', 0); // Indefinite info toast
+                menuSaveSuccess = await saveData('menu');
+                
+                showToast('Publishing category changes...', 'info', 0); // Update info toast
+                categorySaveSuccess = await saveData('categories');
+                
+                overallSuccess = menuSaveSuccess && categorySaveSuccess;
+                if(overallSuccess) {
+                    isMenuDirty = false; isCategoriesDirty = false;
+                }
+                showToast(overallSuccess ? 'All changes published successfully!' : 'Publishing completed. Some changes might not have been saved.', overallSuccess ? 'success' : 'error', 5000);
+
+            } catch (error) {
+                showToast('An unexpected error occurred during publishing.', 'error', 5000);
+            } finally {
+                saveAllButton.textContent = 'Publish All Changes';
+                saveAllButton.disabled = false;
+                updatePublishButtonState();
+            }
+        });
     }
 
     // For Manage Categories Page (manage-categories.html)
@@ -211,12 +297,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target.classList.contains('delete-category-btn')) {
                 const categoryToDelete = e.target.dataset.categoryName;
                 if (menuData.some(item => item.category === categoryToDelete)) {
-                    alert(`Cannot delete "${categoryToDelete}" because it is in use.`);
+                    showToast(`Cannot delete "${categoryToDelete}" because it is in use by menu items.`, 'error', 4000);
                     return;
                 }
                 if (confirm(`Are you sure you want to delete the category "${categoryToDelete}"?`)) {
                     categoriesData = categoriesData.filter(cat => cat !== categoryToDelete);
-                    await saveData('categories');
+                    showToast(`Category "${categoryToDelete}" removed. Publish to save changes.`, 'info');
+                    isCategoriesDirty = true; updatePublishButtonState();
                     renderCategoryList();
                     // If adminMenuList exists (e.g., if this logic was on a combined page), update it.
                     if (adminMenuList) renderAdminMenu(); 
@@ -233,31 +320,32 @@ document.addEventListener('DOMContentLoaded', () => {
             if (newCategory && !categoriesData.includes(newCategory)) {
                 categoriesData.push(newCategory);
                 categoriesData.sort();
-                await saveData('categories');
+                isCategoriesDirty = true; updatePublishButtonState();
+                showToast(`Category "${newCategory}" added. Publish to save changes.`, 'info');
                 renderCategoryList();
                 // If adminMenuList exists, update it.
                 if (adminMenuList) renderAdminMenu(); 
                 newCategoryInput.value = '';
             } else if (!newCategory) {
-                alert('Category name cannot be empty.');
+                showToast('Category name cannot be empty.', 'error');
             } else {
-                alert(`Category "${newCategory}" already exists.`);
+                showToast(`Category "${newCategory}" already exists.`, 'error');
             }
         });
     }
 
     // For Add Item Page (add-item.html)
     if (addItemForm) {
-        addItemForm.addEventListener('submit', async (e) => { // Make async for await saveData
+        addItemForm.addEventListener('submit', (e) => { // No longer needs to be async
             e.preventDefault();
             const newName = document.getElementById('item-name').value;
             const newCategory = addItemCategorySelect ? addItemCategorySelect.value : ''; 
             const newDescription = document.getElementById('item-description').value;
             const newPrice = parseFloat(document.getElementById('item-price').value);
             const newIsVeg = addItemDietarySelect ? addItemDietarySelect.value === 'true' : true; 
-            
+
             if (!newName || !newCategory || !newDescription || isNaN(newPrice)) {
-                alert('Please fill out all fields to add an item.');
+                showToast('Please fill out all fields correctly to add an item.', 'error');
                 return;
             }
 
@@ -271,12 +359,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 image: `https://placehold.co/600x400/333333/FBBF24?text=${encodeURIComponent(newName)}` // Use encodeURIComponent
             };
             menuData.push(newItem);
-            
-            await saveData('menu'); // Save immediately
+            showToast(`Item "${newName}" added. Publish to save changes.`, 'info');
+            isMenuDirty = true; updatePublishButtonState();
             // After successfully saving, re-render the menu list
             // to reflect the newly added item in the "Update Menu" tab.
             if (adminMenuList) renderAdminMenu();
-
             e.target.reset();
             if (addItemCategorySelect) populateCategoryDropdown(addItemCategorySelect); // Repopulate to reset selection
         });

@@ -37,8 +37,8 @@
   },
   {
     "name": "Bissibele bath",
-    "description": "something",
-    "price": 55,
+    "description": "xss",
+    "price": 222,
     "category": "Breakfast",
     "isAvailable": true,
     "isVeg": true,
