@@ -31,18 +31,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
         finalItems.forEach(item => {
             const card = document.createElement('div');
-            card.className = 'bg-white rounded-lg overflow-hidden shadow-lg border border-gray-200'; // Light theme card
-            const availabilityClass = item.isAvailable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'; // Light theme availability
-            const availabilityText = item.isAvailable ? 'Available' : 'Unavailable';
+            let cardBaseClasses = 'bg-white rounded-lg overflow-hidden shadow-lg border border-gray-200';
+            let toggleClasses = 'p-4 flex justify-between items-center accordion-toggle cursor-pointer'; // Always allow cursor pointer
+            let soldOutOverlayHTML = '';
+            let soldOutTagHTML = '';
+            let imageClasses = 'w-full h-48 object-cover';
+            let accordionArrowHTML = `<svg class="w-6 h-6 text-gray-500 transform transition-transform duration-300 accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
+            
+            const priceHTML = `<p class="font-semibold text-gray-700 text-lg">₹${parseFloat(item.price).toFixed(2)}</p>`;
+
+            if (!item.isAvailable) {
+                cardBaseClasses += ' is-sold-out'; // General class for sold-out state
+                imageClasses += ' filter grayscale opacity-60'; // Style the image when sold out
+                soldOutTagHTML = `<span class="text-xs font-bold uppercase px-3 py-1.5 rounded-md bg-red-600 text-white">Sold Out</span>`;
+                soldOutOverlayHTML = `
+                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10 pointer-events-none">
+                        <span class="text-white text-3xl font-bold uppercase tracking-wider transform -rotate-12 border-4 border-white px-4 py-2 rounded shadow-lg">Sold Out</span>
+                    </div>
+                `;
+                // Keep accordionArrowHTML for sold out items as well, if they are to be expandable
+            }
+
+            card.className = cardBaseClasses;
+
             card.innerHTML = `
-                <div class="p-4 cursor-pointer flex justify-between items-center accordion-toggle">
+                <div class="${toggleClasses}">
                     <div class="flex-grow"><div class="flex items-center gap-3">${item.isVeg ?
                         `<i class="fa-solid fa-leaf h-5 w-5 text-green-500" title="Veg"></i>` :
                         `<i class="fa-solid fa-drumstick-bite h-5 w-5 text-red-500" title="Non-Veg"></i>`
                     }<h3 class="font-bold text-lg text-gray-800">${item.name}</h3></div></div>
-                    <div class="flex items-center gap-4"><span class="text-xs font-semibold px-2 py-1 rounded-full ${availabilityClass}">${availabilityText}</span><svg class="w-6 h-6 text-gray-500 transform transition-transform duration-300 accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
+                    <div class="flex items-center gap-x-3">
+                        ${priceHTML}
+                        ${soldOutTagHTML}
+                        ${accordionArrowHTML}
+                    </div>
                 </div>
-                <div class="accordion-content"><img src="${item.image}" alt="${item.name}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/f0f0f0/333333?text=Image+Not+Found';"><div class="p-4"><p class="text-gray-600 mt-1 mb-2 text-sm">₹${parseFloat(item.price).toFixed(2)}</p><p class="text-gray-700 text-base">${item.description}</p></div></div>
+                <div class="accordion-content relative">
+                    ${soldOutOverlayHTML}
+                    <img src="${item.image}" alt="${item.name}" class="${imageClasses}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/f0f0f0/333333?text=Image+Not+Found';">
+                    <div class="p-4">
+                        <p class="text-gray-700 text-base">${item.description}</p>
+                    </div>
+                </div>
             `;
             menuGrid.appendChild(card);
         });
@@ -69,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isExpanded = content.style.maxHeight && content.style.maxHeight !== "0px";
             document.querySelectorAll('.accordion-content').forEach(c => c.style.maxHeight = null);
             document.querySelectorAll('.accordion-arrow').forEach(i => i.classList.remove('rotate-180'));
-            if (!isExpanded) {
+            if (!isExpanded && icon) { 
                 content.style.maxHeight = content.scrollHeight + "px";
                 icon.classList.add('rotate-180');
             }
