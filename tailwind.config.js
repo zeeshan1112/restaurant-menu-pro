@@ -9,6 +9,7 @@ module.exports = {
       fontFamily: {
         'brand': ['"Playfair Display"', 'serif'],
         'sans': ['"Roboto"', 'sans-serif'],
+        'jakarta': ['"Plus Jakarta Sans"', 'sans-serif'],
       },
       colors: {
         amber: {

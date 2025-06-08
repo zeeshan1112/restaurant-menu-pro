@@ -40,9 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderCategoryList = () => {
         if (!Array.isArray(categoriesData)) return;
         categoryListDiv.innerHTML = categoriesData.map(cat => 
-            `<div class="flex items-center justify-between py-1 text-gray-300">
+            `<div class="flex items-center justify-between py-1 text-gray-700">
                 <span>${cat}</span>
-                <button data-category-name="${cat}" class="delete-category-btn text-red-500 hover:text-red-400 text-xs font-semibold uppercase">Remove</button>
+                <button data-category-name="${cat}" class="delete-category-btn text-red-600 hover:text-red-500 text-xs font-semibold uppercase">Remove</button>
             </div>`
         ).join('');
         populateCategoryDropdown(addItemCategorySelect);
@@ -51,16 +51,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderAdminMenu = () => {
         adminMenuList.innerHTML = '';
         const header = document.createElement('div');
-        header.className = 'hidden md:grid md:grid-cols-6 gap-4 items-center border-b-2 border-gray-600 pb-2 font-bold text-sm text-gray-400 uppercase tracking-wider';
+        header.className = 'hidden md:grid md:grid-cols-6 gap-4 items-center border-b-2 border-gray-300 pb-2 font-bold text-sm text-gray-500 uppercase tracking-wider';
         header.innerHTML = `<span>Name</span><span>Category</span><span>Price</span><span>Dietary</span><span>Status</span><span>Action</span>`;
         adminMenuList.appendChild(header);
 
         if (!Array.isArray(menuData)) return;
         menuData.forEach((item, index) => {
             const itemDiv = document.createElement('div');
-            itemDiv.className = 'grid grid-cols-1 md:grid-cols-6 gap-4 items-center border-b border-gray-700 py-4';
+            itemDiv.className = 'grid grid-cols-1 md:grid-cols-6 gap-4 items-center border-b border-gray-300 py-4';
             
-            const commonInputClasses = 'w-full px-3 py-2 bg-gray-700 border border-gray-600 text-gray-200 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition';
+            const commonInputClasses = 'w-full px-3 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition';
 
             itemDiv.innerHTML = `
                 <input type="text" value="${item.name}" data-index="${index}" data-field="name" class="${commonInputClasses}">
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="dietary-select-wrapper"></div>
                 <div class="status-select-wrapper"></div>
                 <div class="flex items-center justify-end">
-                    <button class="delete-btn bg-red-800/80 text-white text-xs font-bold uppercase px-3 py-2 rounded-md hover:bg-red-700 transition-colors" data-index="${index}">Delete</button>
+                    <button class="delete-btn bg-red-600 text-white text-xs font-bold uppercase px-3 py-2 rounded-md hover:bg-red-700 transition-colors" data-index="${index}">Delete</button>
                 </div>
             `;
 
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCategoryList();
             renderAdminMenu();
         } catch (error) {
-            adminMenuList.innerHTML = `<p class="text-red-400 font-medium">Could not load site data: ${error.message}</p>`;
+            adminMenuList.innerHTML = `<p class="text-red-600 font-medium">Could not load site data: ${error.message}</p>`;
         }
     };
 

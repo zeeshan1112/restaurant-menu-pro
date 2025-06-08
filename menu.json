@@ -14,7 +14,7 @@
     "category": "Breakfast",
     "description": "Crispy, golden-brown rice crepe roasted with clarified butter (ghee), served with a variety of chutneys and sambar.",
     "image": "https://images.unsplash.com/photo-1668665793392-e4229dd74136?q=80&w=2070&auto=format&fit=crop",
-    "isVeg": false,
+    "isVeg": true,
     "isAvailable": true
   },
   {
