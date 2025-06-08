@@ -34,5 +34,14 @@
     "image": "https://images.unsplash.com/photo-1589304239922-1e341c278e0d?q=80&w=1974&auto=format&fit=crop",
     "isVeg": false,
     "isAvailable": false
+  },
+  {
+    "name": "Bissibele bath",
+    "description": "something",
+    "price": 55,
+    "category": "Breakfast",
+    "isAvailable": true,
+    "isVeg": true,
+    "image": "https://placehold.co/600x400/333333/FBBF24?text=Bissibele%20bath"
   }
 ]

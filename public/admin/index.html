@@ -10,56 +10,52 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/admin.js" defer></script>
-    <style> 
-        /* Tailwind's font-sans and font-brand classes handle this, so this inline style can be removed if desired. */
-        body { font-family: 'Roboto', sans-serif; } /* Default font, also covered by Tailwind's font-sans */
-        h1, h2, h3 { font-family: 'Playfair Display', serif; } /* Brand font, also covered by Tailwind's font-brand */
-    </style>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans">
 
-    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
-        
-        <header class="mb-8 flex flex-col sm:flex-row justify-between items-center border-b border-gray-300 pb-4">
-            <div>
-                <h1 class="font-brand text-3xl md:text-4xl text-amber-400">Virundhu Mane</h1>
-                <h2 class="text-xl md:text-2xl text-gray-600">Menu Management</h2>
+    <header class="sticky top-0 z-30 bg-gray-100 shadow-md w-full border-b border-gray-300 h-20"> 
+        <div class="container mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center gap-3 sm:gap-4">
+                <div class="flex-shrink-0">
+                    <h1 class="font-brand text-2xl sm:text-3xl md:text-4xl text-amber-400 leading-tight">Virundhu Mane</h1>
+                    <h2 class="text-lg sm:text-xl md:text-2xl text-gray-600 leading-tight">Menu Management</h2>
+                </div>
             </div>
-            <button id="logout-button" class="mt-4 sm:mt-0 px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors duration-300">Logout</button>
-        </header>
+            <button id="logout-button" class="flex-shrink-0 px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors duration-300">Logout</button>
+        </div>
+    </header>
 
-        <main class="space-y-12">
-            <!-- Edit Menu Items Section -->
-            <div class="bg-white border border-gray-200 rounded-lg shadow-lg p-6">
+    <!-- Tab Navigation -->
+    <div class="sticky z-20 bg-gray-100 shadow-sm w-full top-20 h-14">
+        <div class="container mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8 border-b border-gray-200">
+            <div class="flex-grow overflow-x-auto min-w-0 whitespace-nowrap">
+                <nav id="admin-tabs" class="-mb-px flex space-x-4 sm:space-x-8 h-full items-center" aria-label="Tabs">
+                    <button data-tab-target="#edit-menu-section" class="admin-tab whitespace-nowrap py-3 px-2 border-b-2 font-medium text-sm border-amber-500 text-amber-600" aria-current="page">
+                        Update Menu
+                    </button>
+                    <button data-tab-target="#add-item-section" class="admin-tab whitespace-nowrap py-3 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        Add New Item
+                    </button>
+                    <button data-tab-target="#manage-categories-section" class="admin-tab whitespace-nowrap py-3 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        Manage Categories
+                    </button>
+                </nav>
+            </div>
+            <button id="save-all-changes" class="ml-4 flex-shrink-0 bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg shadow-md hover:bg-amber-400 transition-colors duration-300 text-sm">Publish All Changes</button>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-[1.5rem]">
+        <main>
+            <!-- Edit Menu Items Section (Visible by default) -->
+            <section id="edit-menu-section" class="admin-tab-content bg-white border border-gray-200 rounded-lg shadow-lg p-6 mb-12">
                  <h3 class="font-brand text-2xl mb-4 text-gray-800">Edit Menu Items</h3>
                  <div id="admin-menu-list" class="space-y-4">
                     <p class="text-gray-500">Loading menu items...</p>
                 </div>
-            </div>
+            </section>
 
-            <!-- Publish Button -->
-            <button id="save-all-changes" class="w-full bg-amber-500 text-gray-900 font-bold py-3 px-6 rounded-lg shadow-md hover:bg-amber-400 transition-colors duration-300">Publish All Changes</button>
-
-            <!-- Manage Categories Section -->
-            <div class="bg-white border border-gray-200 rounded-lg shadow-lg p-6">
-                <h3 class="font-brand text-2xl mb-4 text-gray-800">Manage Categories</h3>
-                <div class="md:flex md:items-start md:space-x-8">
-                    <form id="add-category-form" class="flex-grow flex items-end space-x-4 mb-6 md:mb-0">
-                        <div class="flex-grow">
-                            <label for="new-category-name" class="block text-sm font-medium text-gray-600 mb-1">New Category Name</label>
-                            <input type="text" id="new-category-name" placeholder="e.g., Sides" class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition">
-                        </div>
-                        <button type="submit" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition-colors">Add</button>
-                    </form>
-                    <div class="md:pl-8 md:border-l border-gray-300 md:w-1/3">
-                        <label class="block text-sm font-medium text-gray-600 mb-2">Existing Categories</label>
-                        <div id="category-list" class="text-sm text-gray-700 space-y-2"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Add New Item Section -->
-            <div class="bg-white p-6 sm:p-8 rounded-lg shadow-lg border border-gray-200">
+            <section id="add-item-section" class="admin-tab-content hidden bg-white p-6 sm:p-8 rounded-lg shadow-lg border border-gray-200 mb-12">
                 <h3 class="font-brand text-2xl mb-6 border-b border-gray-300 pb-4 text-gray-800">Add New Item</h3>
                 <form id="add-item-form" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -93,7 +89,24 @@
                         <button type="submit" class="bg-amber-500 text-gray-900 font-bold py-3 px-8 rounded-lg hover:bg-amber-400">Add Item to Menu</button>
                     </div>
                 </form>
-            </div>
+            </section>
+
+            <section id="manage-categories-section" class="admin-tab-content hidden bg-white border border-gray-200 rounded-lg shadow-lg p-6">
+                <h3 class="font-brand text-2xl mb-4 text-gray-800">Manage Categories</h3>
+                <div class="md:flex md:items-start md:space-x-8">
+                    <form id="add-category-form" class="flex-grow flex items-end space-x-4 mb-6 md:mb-0">
+                        <div class="flex-grow">
+                            <label for="new-category-name" class="block text-sm font-medium text-gray-600 mb-1">New Category Name</label>
+                            <input type="text" id="new-category-name" placeholder="e.g., Sides" class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition">
+                        </div>
+                        <button type="submit" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition-colors">Add</button>
+                    </form>
+                    <div class="md:pl-8 md:border-l border-gray-300 md:w-1/3">
+                        <label class="block text-sm font-medium text-gray-600 mb-2">Existing Categories</label>
+                        <div id="category-list" class="text-sm text-gray-700 space-y-2"></div>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 </body>
