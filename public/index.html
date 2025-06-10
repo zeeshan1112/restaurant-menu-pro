@@ -18,12 +18,13 @@
     <style>
         /* Basic CSS Variables for Theming */
         :root {
-            --bg-primary: #f9fafb; /* Tailwind gray-50 */
+            --bg-primary: #f1f5f9;    /* slate-100 */
             --bg-secondary: #ffffff; /* white */
-            --text-primary: #1f2937; /* Tailwind gray-800 */
-            --text-secondary: #4b5563; /* Tailwind gray-600 */
-            --border-color: #e5e7eb; /* Tailwind gray-200 */
+            --text-primary: #0f172a;   /* slate-900 */
+            --text-secondary: #64748b; /* slate-500 */
+            --border-color: #e2e8f0;   /* slate-200 */
             --accent-color: #F59E0B; /* Tailwind amber-500 */
+            --accent-color-hover: #D97706; /* amber-600 */
         }
 
         html.dark {
@@ -32,7 +33,7 @@
             --text-primary: #f3f4f6;    /* Tailwind gray-100 */
             --text-secondary: #d1d5db;  /* Tailwind gray-300 */
             --border-color: #4b5563;   /* Tailwind gray-600 */
-            /* Accent color can remain the same or change for dark mode */
+            --accent-color-hover: #FBBF24; /* amber-400 */
         }
 
         /* Apply theme variables */
@@ -45,6 +46,7 @@
         .bg-theme-secondary { background-color: var(--bg-secondary); }
         .text-theme-secondary { color: var(--text-secondary); }
         .text-theme-accent { color: var(--accent-color); }
+        .hover\:text-theme-accent-hover:hover { color: var(--accent-color-hover); }
         .border-theme { border-color: var(--border-color); }
 
         /* Specific overrides for elements if needed */
@@ -53,7 +55,8 @@
             border-bottom-color: var(--border-color); /* For the shadow-sm to pick up */
         }
         .nav-link { color: var(--text-secondary); } /* Default nav link color */
-        .nav-link.active, .nav-link:hover { color: var(--accent-color); } /* Active/hover nav link */
+        .nav-link.active { color: var(--accent-color); font-weight: 600; }
+        .nav-link:hover { color: var(--accent-color); }
         
         /* Ensure page content sections adapt if they have specific backgrounds */
         .page-content { 
@@ -94,7 +97,7 @@
     <!-- Menu Section (Default Visible) -->
     <section id="menu-content" class="page-content py-12 md:py-16">
         <div class="container mx-auto px-6 lg:px-8">
-            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-amber-400 mb-10">Discover Our Menu</h2>
+            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-theme-accent mb-10">Discover Our Menu</h2>
             
             <div class="flex flex-row justify-center items-center my-8 space-x-6 sm:space-x-8">
                  <div class="flex items-center space-x-2">
@@ -154,15 +157,15 @@
         <div class="container mx-auto px-6 lg:px-8 text-center">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                 <div>
-                    <h5 class="font-semibold text-lg text-amber-400 mb-2">Visit Us</h5>
+                    <h5 class="font-semibold text-lg text-theme-accent mb-2">Visit Us</h5>
                     <p class="text-gray-400">3J3W+V36, Narayanapura, Bengaluru, Karnataka 560077, India</p>
                 </div>
                 <div>
-                    <h5 class="font-semibold text-lg text-amber-400 mb-2">Contact</h5>
+                    <h5 class="font-semibold text-lg text-theme-accent mb-2">Contact</h5>
                     <p>Phone: <a href="tel:+919876543210" class="hover:text-amber-300">+91 98765 43210</a></p>
                 </div>
                 <div>
-                    <h5 class="font-semibold text-lg text-amber-400 mb-2">Hours</h5>
+                    <h5 class="font-semibold text-lg text-theme-accent mb-2">Hours</h5>
                     <p>Mon - Sun: 8:00 AM - 10:00 PM</p>
                     <p class="text-sm">(Breakfast: 8-11 AM | Lunch: 12-3 PM | Dinner: 6-10 PM)</p>
                 </div>

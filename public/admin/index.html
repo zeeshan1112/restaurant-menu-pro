@@ -17,7 +17,7 @@
         <div class="container mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8">
             <div class="flex items-center gap-3 sm:gap-4">
                 <div class="flex-shrink-0">
-                    <h1 class="font-brand text-2xl sm:text-3xl md:text-4xl text-amber-400 leading-tight">Virundhu Mane</h1>
+                    <h1 id="admin-brand-title" class="font-brand text-2xl sm:text-3xl md:text-4xl text-theme-accent leading-tight">Virundhu Mane</h1>
                     <h2 class="text-lg sm:text-xl md:text-2xl text-gray-600 leading-tight">Menu Management</h2>
                 </div>
             </div>
@@ -38,6 +38,9 @@
                     </button>
                     <button data-tab-target="#manage-categories-section" class="admin-tab whitespace-nowrap py-3 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                         Manage Categories
+                    </button>
+                    <button data-tab-target="#site-settings-section" class="admin-tab whitespace-nowrap py-3 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        Site Settings
                     </button>
                 </nav>
             </div>
@@ -112,6 +115,22 @@
                         <div id="category-list" class="text-sm text-gray-700 space-y-2"></div>
                     </div>
                 </div>
+            </section>
+
+            <!-- Site Settings Section -->
+            <section id="site-settings-section" class="admin-tab-content hidden bg-white border border-gray-200 rounded-lg shadow-lg p-6 mb-12">
+                <h3 class="font-brand text-2xl mb-6 border-b border-gray-300 pb-4 text-gray-800">Site Settings</h3>
+                <form id="site-settings-form" class="space-y-6">
+                    <div>
+                        <label for="accent-color-picker" class="block text-sm font-medium text-gray-600 mb-1">Accent Color</label>
+                        <div class="flex items-center space-x-3">
+                            <input type="color" id="accent-color-picker" name="accentColor" class="h-10 w-16 p-1 border border-gray-300 rounded-lg cursor-pointer">
+                            <input type="text" id="accent-color-hex" name="accentColorHex" class="w-full max-w-xs px-4 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500" pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$">
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Select a color or enter a hex value (e.g., #F59E0B).</p>
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-600 transition-colors">Save Accent Color</button>
+                </form>
             </section>
         </main>
     </div>

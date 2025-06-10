@@ -33,6 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
         currentYearEl.textContent = new Date().getFullYear();
     }
 
+    // --- DYNAMIC ACCENT COLOR APPLICATION (PUBLIC) ---
+    const applyPublicAccentColor = (color, hoverColor) => {
+        document.documentElement.style.setProperty('--accent-color', color);
+        document.documentElement.style.setProperty('--accent-color-hover', hoverColor);
+        // If theme toggle icons need to change color based on accent:
+        if (themeIconLight) themeIconLight.style.color = color;
+        // Note: themeIconDark uses indigo, might want to keep it or make it themeable too
+    };
+
+
     // --- THEME SWITCHER LOGIC ---
     const applyTheme = (theme) => {
         if (theme === 'dark') {
@@ -55,11 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateSwitchUI = (switchEl, knobEl, isActive) => {
         if (isActive) {
             knobEl.style.transform = 'translateX(22px)'; // For w-12 h-6 track (48px), w-5 h-5 knob (20px), p-0.5 (2px each side) -> 48 - 20 - 4 = 24px. Let's use 22px for a bit of margin.
-            switchEl.classList.remove('bg-gray-200');
-            switchEl.classList.add('bg-amber-500'); // Use accent color for active state
+            switchEl.classList.remove('bg-gray-300', 'dark:bg-gray-600');
+            switchEl.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
         } else {
             knobEl.style.transform = 'translateX(0px)'; // Corrected from 'translateX(0px)' to ensure it's a string
-            switchEl.classList.remove('bg-amber-500');
+            switchEl.style.backgroundColor = ''; // Revert to CSS classes
             switchEl.classList.add('bg-gray-300', 'dark:bg-gray-600'); // Add back both light and dark inactive states
         }
     };
@@ -138,9 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Base classes for all tabs
             let tabClasses = 'px-3 py-3 text-base md:text-lg focus:outline-none transition-all duration-300 ease-in-out';
             if (category === activeCategory) {
-                tabClasses += ' text-amber-500 border-b-2 border-amber-500 font-semibold';
+                tabClasses += ' text-theme-accent border-b-2 border-theme-accent font-semibold';
             } else {
-                tabClasses += ' text-gray-500 hover:text-amber-500 border-b-2 border-transparent hover:border-amber-300 font-medium';
+                tabClasses += ' text-theme-secondary hover:text-theme-accent border-b-2 border-transparent hover:border-theme-accent font-medium';
             }
             button.className = tabClasses;
             button.dataset.category = category;
@@ -297,12 +307,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update active nav link
         mainNav.querySelectorAll('.nav-link').forEach(link => {
-            if (link.dataset.page === pageId) { // Active link
-                link.classList.add('text-theme-accent', 'font-bold'); 
+            if (link.dataset.page === pageId) {
+                link.classList.add('active'); // Uses CSS var for color
                 link.classList.remove('text-theme-secondary');
             } else {
-                link.classList.remove('text-theme-accent', 'font-bold');
-                link.classList.add('text-theme-secondary');
+                link.classList.remove('active'); // Correctly remove the 'active' class
+                link.classList.add('text-theme-secondary'); // Ensure default color is applied
             }
         });
         window.scrollTo(0,0); // Scroll to top when changing "pages"
@@ -336,6 +346,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Apply stored theme on initial load
             const storedTheme = localStorage.getItem('theme') || 'light';
             applyTheme(storedTheme);
+
+            // Fetch and apply site settings (accent color)
+            try {
+                const settingsResponse = await fetch('/.netlify/functions/settings');
+                if (settingsResponse.ok) {
+                    const siteSettings = await settingsResponse.json();
+                    applyPublicAccentColor(siteSettings.accentColor, siteSettings.accentColorHover);
+                }
+            } catch (settingsError) { console.error("Failed to load site accent color:", settingsError); }
             
             renderMenu();
             showPage('menu'); // Show menu page by default

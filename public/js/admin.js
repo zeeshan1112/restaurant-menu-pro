@@ -20,7 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const addCategoryForm = document.getElementById('add-category-form');
     const categoryListDiv = document.getElementById('category-list');
     const addItemCategorySelect = document.getElementById('item-category-select');
+    // Site Settings Elements
+    const siteSettingsForm = document.getElementById('site-settings-form');
+    const accentColorPicker = document.getElementById('accent-color-picker');
+    const accentColorHexInput = document.getElementById('accent-color-hex');
     const addItemDietarySelect = document.getElementById('item-dietary-select');
+    const adminBrandTitle = document.getElementById('admin-brand-title');
     let menuData = [];
     let categoriesData = [];
     let isMenuDirty = false;
@@ -55,14 +60,19 @@ document.addEventListener('DOMContentLoaded', () => {
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 // Deactivate all tabs
+                const currentAccentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
+
                 tabs.forEach(t => {
-                    t.classList.remove('border-amber-500', 'text-amber-600');
+                    t.style.borderColor = 'transparent'; // Use style for dynamic color
+                    t.style.color = ''; // Revert to CSS class color
                     t.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                    t.classList.remove('text-amber-600'); // Remove old hardcoded class if any
                     t.removeAttribute('aria-current');
                 });
 
                 // Activate clicked tab
-                tab.classList.add('border-amber-500', 'text-amber-600');
+                tab.style.borderColor = currentAccentColor;
+                tab.style.color = currentAccentColor; // Or a darker shade if preferred
                 tab.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
                 tab.setAttribute('aria-current', 'page');
 
@@ -109,6 +119,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // --- DYNAMIC ACCENT COLOR APPLICATION (ADMIN) ---
+    const applyAccentColorToAdmin = (color, hoverColor) => {
+        document.documentElement.style.setProperty('--accent-color', color);
+        document.documentElement.style.setProperty('--accent-color-hover', hoverColor);
+        
+        // Update elements that might not be using CSS variables directly or need explicit refresh
+        if (saveAllButton) {
+            saveAllButton.style.backgroundColor = color;
+            // For hover, you'd typically rely on CSS :hover with the --accent-color-hover variable
+            // or add mouseover/mouseout listeners if more complex JS interaction is needed.
+        }
+
+        if (adminBrandTitle) {
+            adminBrandTitle.style.color = color;
+        }
+
+        if (adminTabsContainer) {
+            adminTabsContainer.querySelectorAll('.admin-tab').forEach(tab => {
+                if (tab.getAttribute('aria-current') === 'page') {
+                    tab.style.borderColor = color;
+                    tab.style.color = color; 
+                } else {
+                    // Ensure non-active tabs revert to their default themed style
+                    tab.style.color = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim(); // Example
+                }
+            });
+        }
+        // You might need to re-style other buttons or elements here if they use the accent color
+    };
     // --- HELPER & RENDER FUNCTIONS ---
     const populateCategoryDropdown = (selectElement, selectedValue) => {
         selectElement.innerHTML = '';
@@ -211,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Call render functions only if their target elements exist
             renderCategoryList();
             renderAdminMenu();
+            await loadAndApplySiteSettings(); // Load site settings including accent color
             // If on add-item page, populate its category dropdown initially
             if (addItemCategorySelect) {
                 populateCategoryDropdown(addItemCategorySelect);
@@ -369,5 +409,56 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- SITE SETTINGS LOGIC ---
+    const loadAndApplySiteSettings = async () => {
+        try {
+            const response = await fetch('/.netlify/functions/settings');
+            if (!response.ok) throw new Error('Failed to fetch site settings.');
+            const settings = await response.json();
+            if (settings.accentColor && accentColorPicker && accentColorHexInput) {
+                accentColorPicker.value = settings.accentColor;
+                accentColorHexInput.value = settings.accentColor;
+            }
+            applyAccentColorToAdmin(settings.accentColor, settings.accentColorHover);
+        } catch (error) {
+            console.error("Error loading site settings:", error);
+            showToast('Could not load site settings.', 'error');
+        }
+    };
+
+    if (siteSettingsForm && accentColorPicker && accentColorHexInput) {
+        accentColorPicker.addEventListener('input', (e) => {
+            accentColorHexInput.value = e.target.value;
+        });
+        accentColorHexInput.addEventListener('input', (e) => {
+            if (/^#[0-9A-F]{6}$/i.test(e.target.value) || /^#[0-9A-F]{3}$/i.test(e.target.value)) {
+                accentColorPicker.value = e.target.value;
+            }
+        });
+
+        siteSettingsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newAccentColor = accentColorHexInput.value;
+            if (!newAccentColor || !/^#[0-9A-F]{6}$/i.test(newAccentColor)) {
+                showToast('Please enter a valid 6-digit hex color (e.g., #F59E0B).', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/.netlify/functions/settings', {
+                    method: 'POST',
+                    body: JSON.stringify({ accentColor: newAccentColor }) // Let backend derive hover
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message || 'Failed to save accent color.');
+                
+                showToast('Accent color saved successfully!', 'success');
+                applyAccentColorToAdmin(result.settings.accentColor, result.settings.accentColorHover); // Apply immediately
+            } catch (error) {
+                showToast(`Error saving accent color: ${error.message}`, 'error');
+                console.error("Error saving accent color:", error);
+            }
+        });
+    }
     loadInitialData();
 });
