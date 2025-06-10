@@ -11,10 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainNav = document.getElementById('main-nav');
     const pageSections = document.querySelectorAll('.page-content');
     const faqAccordionContainer = document.getElementById('faq-accordion');
+    const themeToggleButton = document.getElementById('theme-toggle-button');
+    const themeIconLight = document.getElementById('theme-icon-light');
+    const themeIconDark = document.getElementById('theme-icon-dark');
+    const stickyCategoryBarWrapper = document.getElementById('sticky-category-bar-wrapper');
 
-    // Adjusted safety check for new structure
-    if (!menuContentSection || !categoryTabsContainer || !vegOnlySwitch || !nonVegOnlySwitch || !mainNav || !faqAccordionContainer) {
-        console.warn('One or more essential elements for menu filtering are missing. Menu script will not run.');
+    if (!menuContentSection || !categoryTabsContainer || !vegOnlySwitch || !nonVegOnlySwitch || !mainNav || !faqAccordionContainer || !themeToggleButton || !themeIconLight || !themeIconDark || !stickyCategoryBarWrapper) {
+        console.warn('One or more essential elements are missing. Script functionalities might be limited.');
         return;
     }
 
@@ -30,15 +33,34 @@ document.addEventListener('DOMContentLoaded', () => {
         currentYearEl.textContent = new Date().getFullYear();
     }
 
+    // --- THEME SWITCHER LOGIC ---
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            themeIconLight.classList.add('hidden');
+            themeIconDark.classList.remove('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            themeIconLight.classList.remove('hidden');
+            themeIconDark.classList.add('hidden');
+        }
+        localStorage.setItem('theme', theme);
+    };
+
+    themeToggleButton.addEventListener('click', () => {
+        const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+
     const updateSwitchUI = (switchEl, knobEl, isActive) => {
         if (isActive) {
             knobEl.style.transform = 'translateX(22px)'; // For w-12 h-6 track (48px), w-5 h-5 knob (20px), p-0.5 (2px each side) -> 48 - 20 - 4 = 24px. Let's use 22px for a bit of margin.
             switchEl.classList.remove('bg-gray-200');
             switchEl.classList.add('bg-amber-500'); // Use accent color for active state
         } else {
-            knobEl.style.transform = 'translateX(0px)';
+            knobEl.style.transform = 'translateX(0px)'; // Corrected from 'translateX(0px)' to ensure it's a string
             switchEl.classList.remove('bg-amber-500');
-            switchEl.classList.add('bg-gray-200'); // Lighter gray for inactive state
+            switchEl.classList.add('bg-gray-300', 'dark:bg-gray-600'); // Add back both light and dark inactive states
         }
     };
     
@@ -59,14 +81,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         finalItems.forEach(item => {
             const card = document.createElement('div');
-            let cardBaseClasses = 'bg-white rounded-lg overflow-hidden shadow-lg border border-gray-200';
+            let cardBaseClasses = 'bg-theme-secondary rounded-lg overflow-hidden shadow-lg border border-theme'; // Use theme classes
             let toggleClasses = 'p-4 flex justify-between items-center accordion-toggle cursor-pointer';
             let soldOutOverlayHTML = '';
             let soldOutTagHTML = '';
             let imageClasses = 'w-full h-48 object-cover';
-            let accordionArrowHTML = `<svg class="w-6 h-6 text-gray-500 transform transition-transform duration-300 accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
+            let accordionArrowHTML = `<svg class="w-6 h-6 text-theme-secondary transform transition-transform duration-300 accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
             
-            const priceHTML = `<p class="font-semibold text-gray-700 text-lg">₹${parseFloat(item.price).toFixed(2)}</p>`;
+            const priceHTML = `<p class="font-semibold text-theme-secondary text-lg">₹${parseFloat(item.price).toFixed(2)}</p>`;
 
             if (!item.isAvailable) {
                 cardBaseClasses += ' is-sold-out';
@@ -87,10 +109,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div title="${item.isVeg ? 'Veg' : 'Non-Veg'}" class="w-5 h-5 border-2 ${item.isVeg ? 'border-green-500' : 'border-red-500'} flex items-center justify-center flex-shrink-0">
                                 <div class="w-2.5 h-2.5 ${item.isVeg ? 'bg-green-500' : 'bg-red-500'} rounded-full"></div>
                             </div>
-                            <h3 class="font-bold text-lg text-gray-800">${item.name}</h3>
+                            <h3 class="font-bold text-lg text-theme-primary">${item.name}</h3>
                         </div>
                     </div>
-                    <div class="flex items-center gap-x-3">
+                    <div class="flex items-center gap-x-3 text-theme-primary">
                         ${priceHTML}
                         ${soldOutTagHTML}
                         ${accordionArrowHTML}
@@ -100,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${soldOutOverlayHTML}
                     <img src="${item.image}" alt="${item.name}" class="${imageClasses}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/f0f0f0/333333?text=Image+Not+Found';">
                     <div class="p-4">
-                        <p class="text-gray-700 text-base">${item.description}</p>
+                        <p class="text-theme-secondary text-base">${item.description}</p>
                     </div>
                 </div>
             `;
@@ -207,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isExpanded = content.style.maxHeight && content.style.maxHeight !== "0px";
             
             document.querySelectorAll('.accordion-content').forEach(c => {
-                if (c !== content) c.style.maxHeight = null;
+                if (c !== content) c.style.maxHeight = '0px'; // Consistent collapsed state
             });
             document.querySelectorAll('.accordion-arrow').forEach(i => {
                 if (i !== icon) i.classList.remove('rotate-180');
@@ -217,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 content.style.maxHeight = content.scrollHeight + "px";
                 icon.classList.add('rotate-180');
             } else if (icon) {
-                content.style.maxHeight = null;
+                content.style.maxHeight = '0px'; // Consistent collapsed state
                 icon.classList.remove('rotate-180');
             }
         }
@@ -228,6 +250,18 @@ document.addEventListener('DOMContentLoaded', () => {
             activeCategory = e.target.dataset.category;
             renderCategoryTabs();
             renderMenu();
+
+            // Ensure menu items are scrolled into view below the sticky category bar
+            if (stickyCategoryBarWrapper && menuGrid.children.length > 0) {
+                const stickyBarBottomViewport = stickyCategoryBarWrapper.getBoundingClientRect().bottom;
+                const menuGridTopViewport = menuGrid.getBoundingClientRect().top;
+                
+                const scrollAmount = menuGridTopViewport - stickyBarBottomViewport;
+
+                if (Math.abs(scrollAmount) > 1) { // Only scroll if not already aligned (with a 1px tolerance)
+                    window.scrollBy({ top: scrollAmount, behavior: 'smooth' });
+                }
+            }
         }
     });
 
@@ -263,10 +297,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update active nav link
         mainNav.querySelectorAll('.nav-link').forEach(link => {
-            if (link.dataset.page === pageId) {
-                link.classList.add('text-amber-500', 'font-bold'); // Example active style
+            if (link.dataset.page === pageId) { // Active link
+                link.classList.add('text-theme-accent', 'font-bold'); 
+                link.classList.remove('text-theme-secondary');
             } else {
-                link.classList.remove('text-amber-500', 'font-bold');
+                link.classList.remove('text-theme-accent', 'font-bold');
+                link.classList.add('text-theme-secondary');
             }
         });
         window.scrollTo(0,0); // Scroll to top when changing "pages"
@@ -296,6 +332,11 @@ document.addEventListener('DOMContentLoaded', () => {
             updateSwitchUI(vegOnlySwitch, vegOnlyKnob, showOnlyVeg); // Initial UI for veg switch
             updateSwitchUI(nonVegOnlySwitch, nonVegOnlyKnob, showOnlyNonVeg); // Initial UI for non-veg switch
             renderFaq(); // Render FAQ items
+            
+            // Apply stored theme on initial load
+            const storedTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(storedTheme);
+            
             renderMenu();
             showPage('menu'); // Show menu page by default
 
