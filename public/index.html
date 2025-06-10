@@ -47,6 +47,7 @@
         .text-theme-secondary { color: var(--text-secondary); }
         .text-theme-accent { color: var(--accent-color); }
         .hover\:text-theme-accent-hover:hover { color: var(--accent-color-hover); }
+        .border-theme-accent { border-color: var(--accent-color); } /* For active tab underline and hover */
         .border-theme { border-color: var(--border-color); }
 
         /* Specific overrides for elements if needed */
@@ -132,7 +133,7 @@
     <!-- About Us Section (Hidden by default) -->
     <section id="about-content" class="page-content hidden py-12 md:py-16 bg-theme-secondary scroll-mt-24">
         <div class="container mx-auto px-6 lg:px-8">
-            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-amber-400 mb-10">About Virundhu Mane</h2>
+            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-theme-accent mb-10">About Virundhu Mane</h2>
             <div class="max-w-3xl mx-auto text-gray-700 space-y-6 leading-relaxed text-lg"> <!-- text-gray-700 might need to be text-theme-secondary -->
                 <p>Welcome to Virundhu Mane, where we bring the authentic, rich, and diverse flavors of Madurai right to your plate. Our culinary journey is a tribute to the legendary hospitality and vibrant food culture of one of Tamil Nadu's most ancient cities.</p>
                 <p>At Virundhu Mane, we believe that food is an experience, a celebration of tradition and taste. Our chefs meticulously prepare each dish using time-honored recipes and the freshest locally-sourced ingredients, ensuring a delightful gastronomic adventure with every bite.</p>
@@ -144,7 +145,7 @@
     <!-- FAQ Section (Hidden by default) -->
     <section id="faq-content" class="page-content hidden py-12 md:py-16 scroll-mt-24">
         <div class="container mx-auto px-6 lg:px-8">
-            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-amber-400 mb-10">Frequently Asked Questions</h2>
+            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-theme-accent mb-10">Frequently Asked Questions</h2>
             <div id="faq-accordion" class="max-w-2xl mx-auto space-y-4">
                 <!-- FAQ items will be dynamically inserted here by main.js -->
                 <div class="text-center text-theme-secondary">Loading FAQs...</div>
