@@ -31,34 +31,42 @@
 </head>
 <body class="bg-gray-50 text-gray-800 scroll-smooth">
 
-    <header class="py-6 bg-white shadow-sm sticky top-0 z-40">
-        <div class="container mx-auto px-6 lg:px-8 text-center">
-            <h1 class="font-brand text-4xl md:text-5xl font-bold text-amber-500">Virundhu Mane</h1>
-            <p class="mt-1 text-lg text-gray-600">Flavors of Madurai</p>
+    <header class="bg-white shadow-sm sticky top-0 z-40 h-24 flex items-center">
+        <div class="container mx-auto px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between">
+            <div class="text-center sm:text-left mb-2 sm:mb-0">
+                <h1 class="font-brand text-3xl md:text-4xl font-bold text-amber-500 cursor-pointer" data-page="menu">Virundhu Mane</h1>
+                <p class="text-sm text-gray-500">Flavors of Madurai</p>
+            </div>
+            <nav id="main-nav" class="flex space-x-4 md:space-x-6">
+                <a href="#menu" data-page="menu" class="nav-link text-gray-700 hover:text-amber-500 font-semibold px-2 py-1">Menu</a>
+                <a href="#about" data-page="about" class="nav-link text-gray-700 hover:text-amber-500 font-semibold px-2 py-1">About Us</a>
+                <a href="#faq" data-page="faq" class="nav-link text-gray-700 hover:text-amber-500 font-semibold px-2 py-1">FAQ</a>
+            </nav>
         </div>
     </header>
 
-    <main id="menu" class="py-12 md:py-16">
+    <!-- Menu Section (Default Visible) -->
+    <section id="menu-content" class="page-content py-12 md:py-16">
         <div class="container mx-auto px-6 lg:px-8">
             <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-amber-400 mb-10">Discover Our Menu</h2>
             
             <div class="flex flex-row justify-center items-center my-8 space-x-6 sm:space-x-8">
                  <div class="flex items-center space-x-2">
-                    <span class="font-semibold text-lg text-green-600">Veg</span>
+                    <span class="font-semibold text-md text-green-600">Veg</span>
                     <div id="veg-only-switch" class="relative w-12 h-6 flex items-center bg-gray-200 rounded-full p-0.5 cursor-pointer transition-colors duration-300 ease-in-out" data-filter-type="veg">
-                        <div id="veg-only-knob" class="bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
+                        <div id="veg-only-knob" class="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
                     </div>
                  </div>
                  <div class="flex items-center space-x-2">
-                    <span class="font-semibold text-lg text-red-600">Non-Veg</span>
+                    <span class="font-semibold text-md text-red-600">Non-Veg</span>
                     <div id="non-veg-only-switch" class="relative w-12 h-6 flex items-center bg-gray-200 rounded-full p-0.5 cursor-pointer transition-colors duration-300 ease-in-out" data-filter-type="non-veg">
-                        <div id="non-veg-only-knob" class="bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
+                        <div id="non-veg-only-knob" class="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
                     </div>
                  </div>
             </div>
 
-            <!-- Sticky Tab Bar Container - Positioned below the header (h-20 = 5rem) -->
-            <div class="sticky top-[120px] md:top-[128px] z-30 bg-gray-50 py-3 shadow-sm -mx-6 px-6 border-b border-gray-300 mb-8">
+            <!-- Sticky Tab Bar Container - Positioned below the header (h-24 = 6rem) -->
+            <div class="sticky top-24 z-30 bg-gray-50 py-3 shadow-sm -mx-6 px-6 border-b border-gray-300 mb-8">
                 <div id="category-tabs" class="container mx-auto flex flex-wrap justify-center gap-x-3 sm:gap-x-6 md:gap-x-8">
                     <!-- Category tabs will be dynamically inserted here by main.js -->
                 </div>
@@ -69,16 +77,32 @@
                 <!-- Menu items will be dynamically inserted here by main.js -->
             </div>
             <p id="no-items-message" class="text-center text-gray-500 mt-8 text-xl hidden">No items found matching your selection.</p>
-    </main>
+        </div>
+    </section>
 
-    <section id="about" class="py-12 md:py-16 bg-white border-t border-gray-200">
+    <!-- About Us Section (Hidden by default) -->
+    <section id="about-content" class="page-content hidden py-12 md:py-16 bg-white scroll-mt-24">
         <div class="container mx-auto px-6 lg:px-8">
-            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-amber-400">About Us</h2>
-            <div class="mt-8 max-w-3xl mx-auto text-center text-gray-700 space-y-4 leading-relaxed">
+            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-amber-400 mb-10">About Virundhu Mane</h2>
+            <div class="max-w-3xl mx-auto text-gray-700 space-y-6 leading-relaxed text-lg">
                 <p>Welcome to Virundhu Mane, where we bring the authentic, rich, and diverse flavors of Madurai right to your plate. Our culinary journey is a tribute to the legendary hospitality and vibrant food culture of one of Tamil Nadu's most ancient cities.</p>
+                <p>At Virundhu Mane, we believe that food is an experience, a celebration of tradition and taste. Our chefs meticulously prepare each dish using time-honored recipes and the freshest locally-sourced ingredients, ensuring a delightful gastronomic adventure with every bite.</p>
+                <p>Join us to savor the essence of Madurai's heritage, served with warmth and a commitment to excellence.</p>
             </div>
         </div>
     </section>
+
+    <!-- FAQ Section (Hidden by default) -->
+    <section id="faq-content" class="page-content hidden py-12 md:py-16 scroll-mt-24">
+        <div class="container mx-auto px-6 lg:px-8">
+            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-amber-400 mb-10">Frequently Asked Questions</h2>
+            <div id="faq-accordion" class="max-w-2xl mx-auto space-y-4">
+                <!-- FAQ items will be dynamically inserted here by main.js -->
+                <div class="text-center text-gray-500">Loading FAQs...</div>
+            </div>
+        </div>
+    </section>
+
 
     <footer class="bg-gray-800 py-8 text-gray-300">
         <div class="container mx-auto px-6 lg:px-8 text-center">

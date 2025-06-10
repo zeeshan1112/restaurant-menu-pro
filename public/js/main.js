@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const menuGrid = document.getElementById('menu-grid');
+    const menuContentSection = document.getElementById('menu-content'); // For showing/hiding
     const categoryTabsContainer = document.getElementById('category-tabs');
     
     const vegOnlySwitch = document.getElementById('veg-only-switch');
@@ -7,8 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const nonVegOnlySwitch = document.getElementById('non-veg-only-switch');
     const nonVegOnlyKnob = document.getElementById('non-veg-only-knob');
     const noItemsMessage = document.getElementById('no-items-message');
+    const mainNav = document.getElementById('main-nav');
+    const pageSections = document.querySelectorAll('.page-content');
+    const faqAccordionContainer = document.getElementById('faq-accordion');
 
-    if (!menuGrid || !categoryTabsContainer || !vegOnlySwitch || !vegOnlyKnob || !nonVegOnlySwitch || !nonVegOnlyKnob || !noItemsMessage) {
+    // Adjusted safety check for new structure
+    if (!menuContentSection || !categoryTabsContainer || !vegOnlySwitch || !nonVegOnlySwitch || !mainNav || !faqAccordionContainer) {
         console.warn('One or more essential elements for menu filtering are missing. Menu script will not run.');
         return;
     }
@@ -18,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeCategory = 'All';
     let showOnlyVeg = false;
     let showOnlyNonVeg = false;
+    let currentPage = 'menu'; // To track the currently visible page/section
 
     const currentYearEl = document.getElementById('current-year');
     if (currentYearEl) {
@@ -120,6 +126,79 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    const faqData = [
+        {
+            question: "Do you use Ajinomoto (MSG) in your food?",
+            answer: "No, we are committed to using only natural ingredients. We do not add Ajinomoto (MSG) to any of our dishes. We believe in letting the fresh spices and ingredients provide the flavor."
+        },
+        {
+            question: "Is the meat you serve Halal?",
+            answer: "Yes, all the meat used in our non-vegetarian dishes is 100% Halal certified. We source our meat from trusted local suppliers who adhere to strict Halal standards."
+        },
+        {
+            question: "Do you offer catering services for events?",
+            answer: "Yes, we offer comprehensive catering services for parties, corporate events, and special occasions. Please contact us directly to discuss your requirements and get a custom quote."
+        }
+    ];
+
+    const renderFaq = () => {
+        if (!faqAccordionContainer) return;
+        faqAccordionContainer.innerHTML = ''; // Clear loading message
+        faqData.forEach((faqItem, index) => {
+            const itemDiv = document.createElement('div');
+            // Added 'faq-item-group' for easier selection in the click handler
+            itemDiv.className = 'bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 group faq-item-group';
+            itemDiv.innerHTML = `
+                <button class="w-full p-4 text-left flex justify-between items-center focus:outline-none faq-toggle hover:bg-gray-50 transition-colors duration-200" aria-expanded="false">
+                    <span class="font-semibold text-gray-700">${faqItem.question}</span>
+                    <span class="faq-icon text-amber-500 text-2xl font-light transform transition-transform duration-300 group-[.is-expanded]:rotate-45">
+                        +
+                    </span>
+                </button>
+                <div class="faq-content px-4 text-gray-600" style="max-height: 0px; overflow: hidden; transition: max-height 0.3s ease-out, padding-bottom 0.3s ease-out;">
+                    <p>${faqItem.answer}</p>
+                </div>
+            `;
+            faqAccordionContainer.appendChild(itemDiv);
+        });
+
+        document.querySelectorAll('.faq-toggle').forEach(button => {
+            button.addEventListener('click', () => {
+                const content = button.nextElementSibling;
+                const currentParentGroup = button.closest('.faq-item-group'); // Use the new class
+                const isCurrentlyExpanded = currentParentGroup.classList.contains('is-expanded');
+
+                // Close all other FAQ items
+                document.querySelectorAll('.faq-item-group').forEach(group => {
+                    if (group !== currentParentGroup) {
+                        group.classList.remove('is-expanded');
+                        group.querySelector('.faq-toggle').setAttribute('aria-expanded', 'false');
+                        const contentToClose = group.querySelector('.faq-content');
+                        if (contentToClose) {
+                            contentToClose.classList.remove('pb-4'); // Remove padding when closing others
+                            contentToClose.style.maxHeight = '0px';
+                        }
+                    }
+                });
+
+                // Toggle the clicked item
+                if (!isCurrentlyExpanded) {
+                    content.classList.add('pb-4'); // Add padding back before expanding
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    currentParentGroup.classList.add('is-expanded');
+                    button.setAttribute('aria-expanded', 'true');
+                } else {
+                    content.classList.remove('pb-4'); // Remove padding when closing
+                    content.style.maxHeight = '0px';
+                    currentParentGroup.classList.remove('is-expanded');
+                    button.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+    };
+
+
+
     menuGrid.addEventListener('click', (e) => {
         const toggle = e.target.closest('.accordion-toggle');
         if (toggle) {
@@ -172,6 +251,34 @@ document.addEventListener('DOMContentLoaded', () => {
         renderMenu();
     });
 
+    const showPage = (pageId) => {
+        currentPage = pageId;
+        pageSections.forEach(section => {
+            if (section.id === `${pageId}-content`) {
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
+            }
+        });
+
+        // Update active nav link
+        mainNav.querySelectorAll('.nav-link').forEach(link => {
+            if (link.dataset.page === pageId) {
+                link.classList.add('text-amber-500', 'font-bold'); // Example active style
+            } else {
+                link.classList.remove('text-amber-500', 'font-bold');
+            }
+        });
+        window.scrollTo(0,0); // Scroll to top when changing "pages"
+    };
+
+    mainNav.addEventListener('click', (e) => {
+        if (e.target.matches('.nav-link') && e.target.dataset.page) {
+            e.preventDefault();
+            showPage(e.target.dataset.page);
+        }
+    });
+
     const init = async () => {
         try {
             const [menuResponse, categoriesResponse] = await Promise.all([
@@ -188,7 +295,9 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCategoryTabs();
             updateSwitchUI(vegOnlySwitch, vegOnlyKnob, showOnlyVeg); // Initial UI for veg switch
             updateSwitchUI(nonVegOnlySwitch, nonVegOnlyKnob, showOnlyNonVeg); // Initial UI for non-veg switch
+            renderFaq(); // Render FAQ items
             renderMenu();
+            showPage('menu'); // Show menu page by default
 
         } catch (error) {
             console.error("Failed to load initial data:", error);
