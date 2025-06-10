@@ -29,47 +29,75 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800 scroll-smooth">
 
-    <header id="home" class="hero-bg h-screen flex flex-col items-center justify-center text-center text-gray-900 p-4">
-        <h1 class="font-brand text-5xl md:text-8xl font-bold">Virindhu Mane</h1>
-        <p class="mt-4 text-xl md:text-3xl">Flavors of Madurai</p>
-        <a href="#menu" class="mt-8 px-8 py-3 bg-amber-500 text-gray-900 font-bold rounded-lg hover:bg-amber-400 transition-colors duration-300">
-            View Menu
-        </a>
+    <header class="py-6 bg-white shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-6 lg:px-8 text-center">
+            <h1 class="font-brand text-4xl md:text-5xl font-bold text-amber-500">Virundhu Mane</h1>
+            <p class="mt-1 text-lg text-gray-600">Flavors of Madurai</p>
+        </div>
     </header>
 
-    <section id="about" class="py-16 md:py-24 bg-white">
+    <main id="menu" class="py-12 md:py-16">
+        <div class="container mx-auto px-6 lg:px-8">
+            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-amber-400 mb-10">Discover Our Menu</h2>
+            
+            <div class="flex flex-row justify-center items-center my-8 space-x-6 sm:space-x-8">
+                 <div class="flex items-center space-x-2">
+                    <span class="font-semibold text-lg text-green-600">Veg</span>
+                    <div id="veg-only-switch" class="relative w-12 h-6 flex items-center bg-gray-200 rounded-full p-0.5 cursor-pointer transition-colors duration-300 ease-in-out" data-filter-type="veg">
+                        <div id="veg-only-knob" class="bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
+                    </div>
+                 </div>
+                 <div class="flex items-center space-x-2">
+                    <span class="font-semibold text-lg text-red-600">Non-Veg</span>
+                    <div id="non-veg-only-switch" class="relative w-12 h-6 flex items-center bg-gray-200 rounded-full p-0.5 cursor-pointer transition-colors duration-300 ease-in-out" data-filter-type="non-veg">
+                        <div id="non-veg-only-knob" class="bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
+                    </div>
+                 </div>
+            </div>
+
+            <!-- Sticky Tab Bar Container - Positioned below the header (h-20 = 5rem) -->
+            <div class="sticky top-[120px] md:top-[128px] z-30 bg-gray-50 py-3 shadow-sm -mx-6 px-6 border-b border-gray-300 mb-8">
+                <div id="category-tabs" class="container mx-auto flex flex-wrap justify-center gap-x-3 sm:gap-x-6 md:gap-x-8">
+                    <!-- Category tabs will be dynamically inserted here by main.js -->
+                </div>
+            </div>
+
+            <!-- Menu Grid - Now outside the sticky container -->
+            <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                <!-- Menu items will be dynamically inserted here by main.js -->
+            </div>
+            <p id="no-items-message" class="text-center text-gray-500 mt-8 text-xl hidden">No items found matching your selection.</p>
+    </main>
+
+    <section id="about" class="py-12 md:py-16 bg-white border-t border-gray-200">
         <div class="container mx-auto px-6 lg:px-8">
             <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-amber-400">About Us</h2>
             <div class="mt-8 max-w-3xl mx-auto text-center text-gray-700 space-y-4 leading-relaxed">
-                <p>Welcome to Virindhu Mane, where we bring the authentic, rich, and diverse flavors of Madurai right to your plate. Our culinary journey is a tribute to the legendary hospitality and vibrant food culture of one of Tamil Nadu's most ancient cities.</p>
+                <p>Welcome to Virundhu Mane, where we bring the authentic, rich, and diverse flavors of Madurai right to your plate. Our culinary journey is a tribute to the legendary hospitality and vibrant food culture of one of Tamil Nadu's most ancient cities.</p>
             </div>
         </div>
     </section>
 
-    <main id="menu" class="py-16 md:py-24">
-        <div class="container mx-auto px-6 lg:px-8">
-            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-amber-400">Our Menu</h2>
-            
-            <div class="flex justify-center items-center my-8 space-x-4">
-                 <span class="font-semibold text-lg toggle-label-all">All</span> <!-- Text color will be inherited from body (text-gray-800) -->
-                 <div id="veg-toggle-switch" class="relative w-14 h-8 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer">
-                    <div id="veg-toggle-knob" class="bg-amber-400 w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
-                 </div>
-                 <span class="font-semibold text-lg toggle-label-veg">Veg</span> <!-- Text color will be inherited -->
-                 <span class="font-semibold text-lg toggle-label-nonveg hidden">Non-Veg</span> <!-- Text color will be inherited -->
+    <footer class="bg-gray-800 py-8 text-gray-300">
+        <div class="container mx-auto px-6 lg:px-8 text-center">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h5 class="font-semibold text-lg text-amber-400 mb-2">Visit Us</h5>
+                    <p class="text-gray-400">123 Spice Street, Madurai, Tamil Nadu 625001</p>
+                </div>
+                <div>
+                    <h5 class="font-semibold text-lg text-amber-400 mb-2">Contact</h5>
+                    <p class="text-gray-400">Phone: <a href="tel:+919876543210" class="hover:text-amber-300">+91 98765 43210</a></p>
+                </div>
+                <div>
+                    <h5 class="font-semibold text-lg text-amber-400 mb-2">Hours</h5>
+                    <p class="text-gray-400">Mon - Sun: 8:00 AM - 10:00 PM</p>
+                    <p class="text-gray-400 text-sm">(Breakfast: 8-11 AM | Lunch: 12-3 PM | Dinner: 6-10 PM)</p>
+                </div>
             </div>
-
-            <div id="category-tabs" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-12"></div>
-            <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-            <p id="no-items-message" class="text-center text-gray-500 mt-8 text-xl hidden">No items found matching your selection.</p>
-        </div>
-    </main>
-
-    <footer class="bg-gray-200 py-8">
-        <div class="container mx-auto px-6 lg:px-8 text-center text-gray-600">
-            <p>&copy; 2025 Virundhu Mane. All Rights Reserved.</p>
+            <p class="text-gray-500 text-sm">&copy; <span id="current-year"></span> Virundhu Mane. All Rights Reserved.</p>
         </div>
     </footer>
 

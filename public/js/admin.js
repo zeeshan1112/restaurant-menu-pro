@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 showToast('An unexpected error occurred during publishing.', 'error', 5000);
             } finally {
-                saveAllButton.textContent = 'Publish All Changes';
+                saveAllButton.textContent = 'Publish';
                 saveAllButton.disabled = false;
                 updatePublishButtonState();
             }
