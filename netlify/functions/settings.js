@@ -1,9 +1,15 @@
 const fs = require('fs');
 const path = require('path');
+const { Octokit } = require("@octokit/rest");
 
 // Assumes site-settings.json is in the project root.
 // Adjust if you place it elsewhere (e.g., a 'data' folder).
 const settingsFilePath = path.resolve(__dirname, '../../site-settings.json');
+
+// --- GITHUB CONFIGURATION ---
+const REPO_OWNER = 'zeeshan1112';
+const REPO_NAME = 'restaurant-menu-pro';
+const FILE_PATH = 'site-settings.json'; // The path to the file in your GitHub repository
 
 // Helper to darken a hex color (basic implementation)
 const darkenColor = (hex, percent) => {
@@ -19,31 +25,42 @@ const darkenColor = (hex, percent) => {
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 };
 
+const octokit = new Octokit({ auth: process.env.GITHUB_PAT });
+
 
 exports.handler = async (event, context) => {
+    const isLocalDev = process.env.NETLIFY_DEV === 'true';
+
     if (event.httpMethod === 'GET') {
-        try {
-            // In a deployed environment, fs.existsSync might not be reliable for files
-            // not bundled with the function. We'll try to read, and if it fails,
-            // return defaults. Writing a default file here won't work on deployed.
+        if (isLocalDev) {
+            console.log(`[settings.js GET] Running in LOCAL mode. Reading from ${settingsFilePath}`);
             try {
                 const settingsData = fs.readFileSync(settingsFilePath, 'utf-8');
                 return { statusCode: 200, body: settingsData };
             } catch (readError) {
-                // If reading fails (e.g., file doesn't exist or not accessible)
                 console.warn(`[settings.js GET] Could not read settings file at ${settingsFilePath}. Returning defaults. Error: ${readError.message}`);
                 const defaultSettings = { accentColor: "#F59E0B", accentColorHover: "#D97706" };
-                // Do not attempt to write the default file in a deployed environment.
-                // If running locally and file doesn't exist, this is where you might create it.
-                if (process.env.NETLIFY_DEV === 'true' && !fs.existsSync(settingsFilePath)) {
+                if (!fs.existsSync(settingsFilePath)) { // Only write if it truly doesn't exist locally
                     fs.writeFileSync(settingsFilePath, JSON.stringify(defaultSettings, null, 2));
                     console.log(`[settings.js GET] Created default settings file locally at ${settingsFilePath}`);
                 }
                 return { statusCode: 200, body: JSON.stringify(defaultSettings) };
             }
-        } catch (error) {
-            console.error("Error reading settings:", error);
-            return { statusCode: 500, body: JSON.stringify({ message: 'Failed to read settings.', error: error.message }) };
+        } else {
+            // LIVE on Netlify: Use GitHub API for GET
+            console.log('[settings.js GET] Running in LIVE mode. Using GitHub API.');
+            try {
+                const { data } = await octokit.repos.getContent({ owner: REPO_OWNER, repo: REPO_NAME, path: FILE_PATH });
+                return { statusCode: 200, body: Buffer.from(data.content, 'base64').toString('utf-8') };
+            } catch (error) {
+                if (error.status === 404) { // File not found on GitHub
+                    console.warn(`[settings.js GET] ${FILE_PATH} not found on GitHub. Returning defaults.`);
+                    const defaultSettings = { accentColor: "#F59E0B", accentColorHover: "#D97706" };
+                    return { statusCode: 200, body: JSON.stringify(defaultSettings) };
+                }
+                console.error("Error reading settings from GitHub:", error);
+                return { statusCode: 500, body: JSON.stringify({ message: 'Failed to read settings from GitHub.', error: error.message }) };
+            }
         }
     }
 
@@ -64,10 +81,8 @@ exports.handler = async (event, context) => {
             // Automatically derive hover color
             newSettingsData.accentColorHover = darkenColor(newSettingsData.accentColor, 10);
 
-            const isLocalDev = process.env.NETLIFY_DEV === 'true';
             let writeSuccessful = false;
             let serverMessage = 'Accent color updated for your current session.';
-
             if (isLocalDev) {
                 try {
                     // fs.writeFileSync is synchronous.
@@ -80,8 +95,22 @@ exports.handler = async (event, context) => {
                     serverMessage = 'Settings updated for current session. Failed to write to file (local dev). Error: ' + writeError.message;
                 }
             } else {
-                serverMessage = 'Accent color updated for your current session. For permanent changes on the live site, the site configuration needs to be updated in your Git repository and redeployed.';
-                console.warn("Write to settings file skipped in deployed environment. Change is ephemeral for this session.");
+                // LIVE on Netlify: Use GitHub API for POST
+                console.log('[settings.js POST] Running in LIVE mode. Using GitHub API to update settings.');
+                try {
+                    const { data: { sha } } = await octokit.repos.getContent({ owner: REPO_OWNER, repo: REPO_NAME, path: FILE_PATH });
+                    await octokit.repos.createOrUpdateFileContents({
+                        owner: REPO_OWNER, repo: REPO_NAME, path: FILE_PATH,
+                        message: `[CMS] Update site settings (accentColor): ${new Date().toISOString()}`,
+                        content: Buffer.from(JSON.stringify(newSettingsData, null, 2)).toString('base64'),
+                        sha: sha,
+                    });
+                    writeSuccessful = true; // Assuming success if no error
+                    serverMessage = 'Site settings updated successfully on GitHub.';
+                } catch (githubError) {
+                    console.error("Error writing settings to GitHub:", githubError);
+                    serverMessage = 'Settings updated for current session. Failed to save to GitHub. Error: ' + githubError.message;
+                }
             }
             return { 
                 statusCode: 200, 
@@ -96,7 +125,7 @@ exports.handler = async (event, context) => {
             console.error("Error processing settings POST request:", parseError);
             return { statusCode: 400, body: JSON.stringify({ message: 'Invalid request data.', error: parseError.message }) };
         }
-    } // This closing brace for the POST block was missing in the mental model of the diff.
+    }
 
     return { statusCode: 405, body: 'Method Not Allowed' };
 };
