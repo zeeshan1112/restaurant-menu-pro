@@ -97,19 +97,38 @@ exports.handler = async (event, context) => {
             } else {
                 // LIVE on Netlify: Use GitHub API for POST
                 console.log('[settings.js POST] Running in LIVE mode. Using GitHub API to update settings.');
+                let currentSha = null;
                 try {
-                    const { data: { sha } } = await octokit.repos.getContent({ owner: REPO_OWNER, repo: REPO_NAME, path: FILE_PATH });
+                    // Try to get current SHA. If file doesn't exist, this will throw.
+                    const response = await octokit.repos.getContent({
+                        owner: REPO_OWNER,
+                        repo: REPO_NAME,
+                        path: FILE_PATH
+                    });
+                    currentSha = response.data.sha;
+                } catch (error) {
+                    if (error.status === 404) {
+                        console.log(`[settings.js POST] ${FILE_PATH} not found on GitHub. Will attempt to create it.`);
+                        // currentSha remains null, createOrUpdateFileContents will create the file
+                    } else {
+                        // For other errors fetching content, pass them to the main catch
+                        throw new Error(`Failed to get current file SHA from GitHub: ${error.message}`);
+                    }
+                }
+
+                try {
                     await octokit.repos.createOrUpdateFileContents({
                         owner: REPO_OWNER, repo: REPO_NAME, path: FILE_PATH,
                         message: `[CMS] Update site settings (accentColor): ${new Date().toISOString()}`,
                         content: Buffer.from(JSON.stringify(newSettingsData, null, 2)).toString('base64'),
-                        sha: sha,
+                        sha: currentSha, // Pass null if creating, or the SHA if updating
                     });
                     writeSuccessful = true; // Assuming success if no error
                     serverMessage = 'Site settings updated successfully on GitHub.';
                 } catch (githubError) {
                     console.error("Error writing settings to GitHub:", githubError);
-                    serverMessage = 'Settings updated for current session. Failed to save to GitHub. Error: ' + githubError.message;
+                    // Keep writeSuccessful as false
+                    serverMessage = `Failed to save settings to GitHub: ${githubError.message}. Changes applied to current session only.`;
                 }
             }
             return { 
@@ -122,7 +141,7 @@ exports.handler = async (event, context) => {
                 }) 
             };
         } catch (parseError) { 
-            console.error("Error processing settings POST request:", parseError);
+            console.error("Error processing settings POST request (outer catch):", parseError);
             return { statusCode: 400, body: JSON.stringify({ message: 'Invalid request data.', error: parseError.message }) };
         }
     }

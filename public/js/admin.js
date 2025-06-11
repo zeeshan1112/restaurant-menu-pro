@@ -451,9 +451,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 const result = await response.json();
                 if (!response.ok) throw new Error(result.message || 'Failed to save accent color.');
-                
-                showToast('Accent color saved successfully!', 'success');
-                applyAccentColorToAdmin(result.settings.accentColor, result.settings.accentColorHover); // Apply immediately
+                                
+                // Use the message from the server, which indicates if GitHub save was successful
+                // and determine toast type based on whether the write to GitHub was successful (if not local dev)
+                const toastType = result.writeAttemptedOnServer && !result.writeSuccessfulOnServer ? 'info' : 'success';
+                showToast(result.message, toastType); 
+
+                // Always apply to current session for immediate feedback
+                applyAccentColorToAdmin(result.settings.accentColor, result.settings.accentColorHover); 
             } catch (error) {
                 showToast(`Error saving accent color: ${error.message}`, 'error');
                 console.error("Error saving accent color:", error);
