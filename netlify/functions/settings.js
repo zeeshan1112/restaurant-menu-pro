@@ -23,18 +23,24 @@ const darkenColor = (hex, percent) => {
 exports.handler = async (event, context) => {
     if (event.httpMethod === 'GET') {
         try {
-            // Check if file exists synchronously for the GET path, as fs.promises.access is async
-            // and might be slightly more complex than needed for this initial check.
-            if (!fs.existsSync(settingsFilePath)) {
-                // Create a default if it doesn't exist for some reason
-                // Note: fs.writeFileSync is synchronous. In a high-traffic scenario, consider async.
+            // In a deployed environment, fs.existsSync might not be reliable for files
+            // not bundled with the function. We'll try to read, and if it fails,
+            // return defaults. Writing a default file here won't work on deployed.
+            try {
+                const settingsData = fs.readFileSync(settingsFilePath, 'utf-8');
+                return { statusCode: 200, body: settingsData };
+            } catch (readError) {
+                // If reading fails (e.g., file doesn't exist or not accessible)
+                console.warn(`[settings.js GET] Could not read settings file at ${settingsFilePath}. Returning defaults. Error: ${readError.message}`);
                 const defaultSettings = { accentColor: "#F59E0B", accentColorHover: "#D97706" };
-                fs.writeFileSync(settingsFilePath, JSON.stringify(defaultSettings, null, 2));
+                // Do not attempt to write the default file in a deployed environment.
+                // If running locally and file doesn't exist, this is where you might create it.
+                if (process.env.NETLIFY_DEV === 'true' && !fs.existsSync(settingsFilePath)) {
+                    fs.writeFileSync(settingsFilePath, JSON.stringify(defaultSettings, null, 2));
+                    console.log(`[settings.js GET] Created default settings file locally at ${settingsFilePath}`);
+                }
                 return { statusCode: 200, body: JSON.stringify(defaultSettings) };
             }
-            // fs.readFileSync is synchronous.
-            const settingsData = fs.readFileSync(settingsFilePath, 'utf-8');
-            return { statusCode: 200, body: settingsData };
         } catch (error) {
             console.error("Error reading settings:", error);
             return { statusCode: 500, body: JSON.stringify({ message: 'Failed to read settings.', error: error.message }) };

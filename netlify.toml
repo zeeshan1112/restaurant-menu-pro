@@ -1,0 +1,13 @@
+# This file explicitly tells Netlify how to handle your project,
+# overriding the faulty auto-detection.
+
+[dev]
+  # This tells the local dev server to act as a simple static server
+  # and to NOT auto-detect a framework, which is likely where the bug is.
+  framework = "#static"
+
+  # IMPORTANT: Change "public" to the actual folder you want to serve.
+  # If your HTML/CSS files are in the root, use "."
+  # If they are in a folder named "dist" or "build", use that.
+  # I see "public" in your original logs, so that is probably correct.
+  publish = "public"
