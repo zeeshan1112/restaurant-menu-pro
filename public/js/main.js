@@ -16,8 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeIconDark = document.getElementById('theme-icon-dark');
     const stickyCategoryBarWrapper = document.getElementById('sticky-category-bar-wrapper');
     const brandTitleLink = document.querySelector('h1.font-brand[data-page="menu"]'); // For navigation
+    const scrollCatLeft = document.getElementById('scroll-cat-left');
+    const scrollCatRight = document.getElementById('scroll-cat-right');
 
-    if (!menuContentSection || !categoryTabsContainer || !vegOnlySwitch || !nonVegOnlySwitch || !mainNav || !faqAccordionContainer || !themeToggleButton || !themeIconLight || !themeIconDark || !stickyCategoryBarWrapper) {
+    if (!menuContentSection || !categoryTabsContainer || !vegOnlySwitch || !nonVegOnlySwitch || !mainNav || !faqAccordionContainer || !themeToggleButton || !themeIconLight || !themeIconDark || !stickyCategoryBarWrapper || !scrollCatLeft || !scrollCatRight) {
         console.warn('One or more essential elements are missing. Script functionalities might be limited.');
         return;
     }
@@ -146,6 +148,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    const updateCategoryScrollArrows = () => {
+        if (!categoryTabsContainer || !scrollCatLeft || !scrollCatRight) return;
+
+        // RAF to prevent layout thrashing if called frequently
+        requestAnimationFrame(() => {
+            const { scrollWidth, clientWidth, scrollLeft } = categoryTabsContainer;
+            const scrollThreshold = 5; // Pixels of tolerance
+
+            const canScrollLeft = scrollLeft > scrollThreshold;
+            const canScrollRight = scrollLeft < (scrollWidth - clientWidth - scrollThreshold);
+
+            scrollCatLeft.classList.toggle('hidden', !canScrollLeft);
+            scrollCatRight.classList.toggle('hidden', !canScrollRight);
+
+            if (scrollWidth <= clientWidth) { // If no scrolling is possible
+                scrollCatLeft.classList.add('hidden');
+                scrollCatRight.classList.add('hidden');
+            }
+        });
+    };
     const renderCategoryTabs = () => {
         categoryTabsContainer.innerHTML = '';
         ['All', ...allCategories].forEach(category => {
@@ -162,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
             button.dataset.category = category;
             categoryTabsContainer.appendChild(button);
         });
+        updateCategoryScrollArrows(); // Update arrows after tabs are rendered
     };
 
     const faqData = [
@@ -277,6 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (Math.abs(scrollAmount) > 1) { // Only scroll if not already aligned (with a 1px tolerance)
                     window.scrollBy({ top: scrollAmount, behavior: 'smooth' });
                 }
+                // Note: renderCategoryTabs is called above, which in turn calls updateCategoryScrollArrows
             }
         }
     });
@@ -356,6 +380,24 @@ document.addEventListener('DOMContentLoaded', () => {
         brandTitleLink.addEventListener('click', handleNavigationClick);
     }
 
+    // Category Scroll Arrow Click Handlers
+    if (scrollCatLeft) {
+        scrollCatLeft.addEventListener('click', () => {
+            if (categoryTabsContainer) {
+                categoryTabsContainer.scrollBy({ left: -categoryTabsContainer.clientWidth * 0.7, behavior: 'smooth' });
+            }
+        });
+    }
+    if (scrollCatRight) {
+        scrollCatRight.addEventListener('click', () => {
+            if (categoryTabsContainer) {
+                categoryTabsContainer.scrollBy({ left: categoryTabsContainer.clientWidth * 0.7, behavior: 'smooth' });
+            }
+        });
+    }
+
+
+
     const init = async () => {
         try {
             const [menuResponse, categoriesResponse] = await Promise.all([
@@ -410,6 +452,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen for hash changes (browser back/forward)
     window.addEventListener('hashchange', handleHashNavigation);
+    // Listen for scroll events on the category tabs to update arrows
+    if (categoryTabsContainer) {
+        categoryTabsContainer.addEventListener('scroll', updateCategoryScrollArrows, { passive: true });
+    }
+    // Listen for window resize to update arrows as scrollability might change
+    window.addEventListener('resize', updateCategoryScrollArrows);
+
 
     init();
 });
