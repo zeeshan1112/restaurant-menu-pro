@@ -121,34 +121,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Helper function to determine text color (black or white) based on background
+    // (Copied from main.js for use in admin panel)
+    const getTextColorForBackground = (hexBgColor) => {
+        if (!hexBgColor) return '#FFFFFF'; // Default to white if no color provided
+
+        const hex = hexBgColor.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+
+        // Calculate luminance using the YIQ formula
+        const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+        return (yiq >= 128) ? '#000000' : '#FFFFFF'; // Return black for light backgrounds, white for dark
+    };
+
     // --- DYNAMIC ACCENT COLOR APPLICATION (ADMIN) ---
     const applyAccentColorToAdmin = (color, hoverColor) => {
         document.documentElement.style.setProperty('--accent-color', color);
         document.documentElement.style.setProperty('--accent-color-hover', hoverColor);
         
-        // Update elements that might not be using CSS variables directly or need explicit refresh
-        if (saveAllButton) {
-            saveAllButton.style.backgroundColor = color;
-            // For hover, you'd typically rely on CSS :hover with the --accent-color-hover variable
-            // or add mouseover/mouseout listeners if more complex JS interaction is needed.
-        }
+        // Style for all .btn-primary elements.
+        // Their background color is assumed to be var(--accent-color) via CSS,
+        // or explicitly set for specific buttons like 'saveAllButton'.
+        // We will now make their text color adaptive.
+        const adaptiveTextColor = getTextColorForBackground(color);
+        document.querySelectorAll('.btn-primary').forEach(button => {
+            if (button.id === 'save-all-changes') { // This is the saveAllButton (Publish button)
+                button.style.backgroundColor = color; // Explicitly set background for this one
+            }
+            button.style.color = adaptiveTextColor; 
+        });
 
         if (adminBrandTitle) {
             adminBrandTitle.style.color = color;
         }
-
-        if (adminTabsContainer) {
-            adminTabsContainer.querySelectorAll('.admin-tab').forEach(tab => {
-                if (tab.getAttribute('aria-current') === 'page') {
-                    tab.style.borderColor = color;
-                    tab.style.color = color; 
-                } else {
-                    // Ensure non-active tabs revert to their default themed style
-                    tab.style.color = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim(); // Example
-                }
-            });
-        }
-        // You might need to re-style other buttons or elements here if they use the accent color
+        // Active tab styling is handled by CSS variables or direct style in tab click handler
     };
     // --- HELPER & RENDER FUNCTIONS ---
     const populateCategoryDropdown = (selectElement, selectedValue) => {

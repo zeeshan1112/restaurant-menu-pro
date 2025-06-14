@@ -45,12 +45,34 @@ document.addEventListener('DOMContentLoaded', () => {
         currentYearEl.textContent = new Date().getFullYear();
     }
 
+    // Helper function to determine text color (black or white) based on background
+    const getTextColorForBackground = (hexBgColor) => {
+        if (!hexBgColor) return '#FFFFFF'; // Default to white if no color provided
+
+        const hex = hexBgColor.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+
+        // Calculate luminance using the YIQ formula
+        const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+        return (yiq >= 128) ? '#000000' : '#FFFFFF'; // Return black for light backgrounds, white for dark
+    };
+
     // --- ANNOUNCEMENT BAR LOGIC ---
     const displayAnnouncement = (text, enabled, accentColor) => {
         if (!announcementBar || !announcementTextDisplay) return; // Ensure elements exist
 
         if (enabled && text) {
-            if (accentColor) announcementBar.style.backgroundColor = accentColor;
+            let textColor = '#FFFFFF'; // Default text color if accentColor is not provided
+            if (accentColor) {
+                announcementBar.style.backgroundColor = accentColor;
+                textColor = getTextColorForBackground(accentColor);
+            }
+            announcementBar.style.color = textColor; // Apply to bar, children like span will inherit
+            if (closeAnnouncementButton) { // Explicitly set for the button as well
+                closeAnnouncementButton.style.color = textColor;
+            }
             announcementTextDisplay.textContent = text;
             announcementBar.classList.remove('hidden');
         } else {
