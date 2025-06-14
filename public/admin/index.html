@@ -21,7 +21,7 @@
                     <h2 class="text-lg sm:text-xl md:text-2xl text-gray-600 leading-tight">Menu Management</h2>
                 </div>
             </div>
-            <button id="logout-button" class="flex-shrink-0 px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors duration-300">Logout</button>
+            <button id="logout-button" class="flex-shrink-0 btn-neutral">Logout</button>
         </div>
     </header>
 
@@ -30,21 +30,21 @@
         <div class="container mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8 border-b border-gray-200">
             <div class="flex-grow overflow-x-auto min-w-0 whitespace-nowrap">
                 <nav id="admin-tabs" class="-mb-px flex space-x-4 sm:space-x-8 h-full items-center" aria-label="Tabs">
-                    <button data-tab-target="#edit-menu-section" class="admin-tab whitespace-nowrap py-3 px-2 border-b-2 font-medium text-sm border-amber-500 text-amber-600" aria-current="page">
+                    <button data-tab-target="#edit-menu-section" class="admin-tab admin-tab-active" aria-current="page">
                         Update Menu
                     </button>
-                    <button data-tab-target="#add-item-section" class="admin-tab whitespace-nowrap py-3 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    <button data-tab-target="#add-item-section" class="admin-tab admin-tab-inactive">
                         Add New Item
                     </button>
-                    <button data-tab-target="#manage-categories-section" class="admin-tab whitespace-nowrap py-3 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    <button data-tab-target="#manage-categories-section" class="admin-tab admin-tab-inactive">
                         Manage Categories
                     </button>
-                    <button data-tab-target="#site-settings-section" class="admin-tab whitespace-nowrap py-3 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    <button data-tab-target="#site-settings-section" class="admin-tab admin-tab-inactive">
                         Site Settings
                     </button>
                 </nav>
             </div>
-            <button id="save-all-changes" class="ml-4 flex-shrink-0 bg-amber-500 text-gray-900 font-bold py-2 px-4 rounded-lg shadow-md hover:bg-amber-400 transition-colors duration-300 text-sm">Publish</button>
+            <button id="save-all-changes" class="ml-4 flex-shrink-0 btn-primary text-sm">Publish</button>
         </div>
     </div>
 
@@ -95,7 +95,7 @@
                         </div>
                     </div>
                     <div class="pt-4">
-                        <button type="submit" class="bg-amber-500 text-gray-900 font-bold py-3 px-8 rounded-lg hover:bg-amber-400">Add Item to Menu</button>
+                        <button type="submit" class="btn-primary">Add Item to Menu</button>
                     </div>
                 </form>
             </section>
@@ -108,7 +108,7 @@
                             <label for="new-category-name" class="block text-sm font-medium text-gray-600 mb-1">New Category Name</label>
                             <input type="text" id="new-category-name" placeholder="e.g., Sides" class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition">
                         </div>
-                        <button type="submit" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition-colors">Add</button>
+                        <button type="submit" class="btn-primary">Add</button>
                     </form>
                     <div class="md:pl-8 md:border-l border-gray-300 md:w-1/3">
                         <label class="block text-sm font-medium text-gray-600 mb-2">Existing Categories</label>
@@ -129,7 +129,7 @@
                         </div>
                         <p class="text-xs text-gray-500 mt-1">Select a color or enter a hex value (e.g., #F59E0B).</p>
                     </div>
-                    <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-600 transition-colors">Save Accent Color</button>
+                    <button type="submit" class="btn-primary">Save Accent Color</button>
                 </form>
             </section>
         </main>

@@ -16,55 +16,7 @@
 
     <script src="/js/main.js" defer></script>
     <style>
-        /* Basic CSS Variables for Theming */
-        :root {
-            --bg-primary: #f1f5f9;    /* slate-100 */
-            --bg-secondary: #ffffff; /* white */
-            --text-primary: #0f172a;   /* slate-900 */
-            --text-secondary: #64748b; /* slate-500 */
-            --border-color: #e2e8f0;   /* slate-200 */
-            --accent-color: #F59E0B; /* Tailwind amber-500 */
-            --accent-color-hover: #D97706; /* amber-600 */
-        }
-
-        html.dark {
-            --bg-primary: #1f2937;    /* Tailwind gray-800 */
-            --bg-secondary: #374151;  /* Tailwind gray-700 */
-            --text-primary: #f3f4f6;    /* Tailwind gray-100 */
-            --text-secondary: #d1d5db;  /* Tailwind gray-300 */
-            --border-color: #4b5563;   /* Tailwind gray-600 */
-            --accent-color-hover: #FBBF24; /* amber-400 */
-        }
-
-        /* Apply theme variables */
-        body {
-            font-family: 'Roboto', sans-serif; /* Default font */
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .bg-theme-secondary { background-color: var(--bg-secondary); }
-        .text-theme-secondary { color: var(--text-secondary); }
-        .text-theme-accent { color: var(--accent-color); }
-        .hover\:text-theme-accent-hover:hover { color: var(--accent-color-hover); }
-        .border-theme-accent { border-color: var(--accent-color); } /* For active tab underline and hover */
-        .border-theme { border-color: var(--border-color); }
-
-        /* Specific overrides for elements if needed */
-        header { /* Applied to the <header> element directly */
-            background-color: var(--bg-secondary);
-            border-bottom-color: var(--border-color); /* For the shadow-sm to pick up */
-        }
-        .nav-link { color: var(--text-secondary); } /* Default nav link color */
-        .nav-link.active { color: var(--accent-color); font-weight: 600; }
-        .nav-link:hover { color: var(--accent-color); }
-        
-        /* Ensure page content sections adapt if they have specific backgrounds */
-        .page-content { 
-            /* If sections have their own backgrounds, ensure they use CSS vars or Tailwind dark: variants */
-        }
-
-
+        /* Page-specific font */
         .hero-bg {
             background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url('https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=2070&auto-format&fit=crop'); /* Light overlay */
             background-size: cover;
@@ -72,10 +24,11 @@
         }
     </style>
 </head>
-<body class="scroll-smooth">
-    <!-- The body class "bg-gray-50 text-gray-800" will be overridden by CSS variables -->
+<body class="scroll-smooth" style="font-family: 'Roboto', sans-serif;">
+    <!-- Global body background and text color are now handled by src/input.css -->
+    <!-- Page-specific font-family applied via inline style to ensure it takes precedence if needed -->
 
-    <header class="shadow-sm sticky top-0 z-40 h-24 flex items-center">
+    <header class="shadow-sm sticky top-0 z-40 h-24 flex items-center header-themed">
         <div class="container mx-auto px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between">
             <div class="text-center sm:text-left mb-2 sm:mb-0">
                 <h1 class="font-brand text-3xl md:text-4xl font-bold text-theme-accent cursor-pointer" data-page="menu">Virundhu Mane</h1>
@@ -83,9 +36,13 @@
             </div>
             <div class="flex items-center space-x-4 md:space-x-6">
                 <nav id="main-nav" class="flex space-x-4 md:space-x-6">
-                    <a href="#menu" data-page="menu" class="nav-link font-semibold px-2 py-1">Menu</a>
-                    <a href="#about" data-page="about" class="nav-link font-semibold px-2 py-1">About Us</a>
-                    <a href="#faq" data-page="faq" class="nav-link font-semibold px-2 py-1">FAQ</a>
+                    <!-- 
+                        Note: font-semibold is now part of .nav-link-themed.active 
+                        If all nav links should be font-semibold, add it directly.
+                    -->
+                    <a href="#menu" data-page="menu" class="nav-link-themed px-2 py-1 font-semibold">Menu</a>
+                    <a href="#about" data-page="about" class="nav-link-themed px-2 py-1 font-semibold">About Us</a>
+                    <a href="#faq" data-page="faq" class="nav-link-themed px-2 py-1 font-semibold">FAQ</a>
                 </nav>
                 <button id="theme-toggle-button" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" aria-label="Toggle theme">
                     <svg id="theme-icon-light" class="h-6 w-6 text-amber-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
@@ -98,28 +55,29 @@
     <!-- Menu Section (Default Visible) -->
     <section id="menu-content" class="page-content py-12 md:py-16">
         <div class="container mx-auto px-6 lg:px-8">
-            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-theme-accent mb-10">Discover Our Menu</h2>
-            
-            <div class="flex flex-row justify-center items-center my-8 space-x-6 sm:space-x-8">
-                 <div class="flex items-center space-x-2">
-                    <span class="font-semibold text-md text-green-600 dark:text-green-400">Veg</span>
-                    <div id="veg-only-switch" class="relative w-12 h-6 flex items-center bg-gray-300 dark:bg-gray-600 rounded-full p-0.5 cursor-pointer transition-colors duration-300 ease-in-out" data-filter-type="veg">
-                        <div id="veg-only-knob" class="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
-                    </div>
-                 </div>
-                 <div class="flex items-center space-x-2">
-                    <span class="font-semibold text-md text-red-600 dark:text-red-400">Non-Veg</span>
-                    <div id="non-veg-only-switch" class="relative w-12 h-6 flex items-center bg-gray-300 dark:bg-gray-600 rounded-full p-0.5 cursor-pointer transition-colors duration-300 ease-in-out" data-filter-type="non-veg">
-                        <div id="non-veg-only-knob" class="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
-                    </div>
-                 </div>
+            <div class="flex flex-row items-center justify-between mb-8">
+                <h2 class="font-brand text-md sm:text-xl md:text-2xl font-bold text-theme-accent text-left mb-0 mr-3">Discover Our Menu</h2>
+                <div class="flex items-center space-x-3">
+                     <div class="flex items-center space-x-2">
+                        <span class="font-semibold text-xs sm:text-sm text-green-600 dark:text-green-400">Veg</span>
+                        <div id="veg-only-switch" class="relative w-8 h-4 flex items-center bg-gray-300 dark:bg-gray-600 rounded-full p-0.5 cursor-pointer transition-colors duration-300 ease-in-out" data-filter-type="veg">
+                            <div id="veg-only-knob" class="bg-white w-3 h-3 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
+                        </div>
+                     </div>
+                     <div class="flex items-center space-x-2">
+                        <span class="font-semibold text-xs sm:text-sm text-red-600 dark:text-red-400">Non-Veg</span>
+                        <div id="non-veg-only-switch" class="relative w-8 h-4 flex items-center bg-gray-300 dark:bg-gray-600 rounded-full p-0.5 cursor-pointer transition-colors duration-300 ease-in-out" data-filter-type="non-veg">
+                            <div id="non-veg-only-knob" class="bg-white w-3 h-3 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
+                        </div>
+                     </div>
+                </div>
             </div>
 
             <!-- Sticky Tab Bar Container - Positioned below the header (h-24 = 6rem) -->
             <div id="sticky-category-bar-wrapper" class="sticky top-24 z-30 py-3 shadow-sm -mx-6 px-6 border-b mb-8 bg-theme-primary border-theme">
-                <div id="category-tabs" class="container mx-auto flex flex-wrap justify-center gap-x-3 sm:gap-x-6 md:gap-x-8">
+                <div id="category-tabs" class="flex overflow-x-auto whitespace-nowrap justify-start gap-x-4 sm:gap-x-6">
                     <!-- Category tabs will be dynamically inserted here by main.js -->
-                </div>
+                    </div>
             </div>
 
             <!-- Menu Grid - Now outside the sticky container -->

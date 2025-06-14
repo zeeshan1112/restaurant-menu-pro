@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeIconLight = document.getElementById('theme-icon-light');
     const themeIconDark = document.getElementById('theme-icon-dark');
     const stickyCategoryBarWrapper = document.getElementById('sticky-category-bar-wrapper');
+    const brandTitleLink = document.querySelector('h1.font-brand[data-page="menu"]'); // For navigation
 
     if (!menuContentSection || !categoryTabsContainer || !vegOnlySwitch || !nonVegOnlySwitch || !mainNav || !faqAccordionContainer || !themeToggleButton || !themeIconLight || !themeIconDark || !stickyCategoryBarWrapper) {
         console.warn('One or more essential elements are missing. Script functionalities might be limited.');
@@ -26,7 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeCategory = 'All';
     let showOnlyVeg = false;
     let showOnlyNonVeg = false;
-    let currentPage = 'menu'; // To track the currently visible page/section
+    // let currentPage = 'menu'; // No longer strictly needed if using hash for state
+
+    const PAGE_IDS = {
+        MENU: 'menu', ABOUT: 'about', FAQ: 'faq'
+    };
 
     const currentYearEl = document.getElementById('current-year');
     if (currentYearEl) {
@@ -64,7 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const updateSwitchUI = (switchEl, knobEl, isActive) => {
         if (isActive) {
-            knobEl.style.transform = 'translateX(22px)'; // For w-12 h-6 track (48px), w-5 h-5 knob (20px), p-0.5 (2px each side) -> 48 - 20 - 4 = 24px. Let's use 22px for a bit of margin.
+            // w-8 track (2rem/32px), w-3 knob (0.75rem/12px), p-0.5 (0.125rem/2px each side)
+            knobEl.style.transform = 'translateX(1rem)'; // 32px - 12px - 4px = 16px = 1rem
             switchEl.classList.remove('bg-gray-300', 'dark:bg-gray-600');
             switchEl.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
         } else {
@@ -295,8 +301,22 @@ document.addEventListener('DOMContentLoaded', () => {
         renderMenu();
     });
 
-    const showPage = (pageId) => {
-        currentPage = pageId;
+    const setActiveNavLink = (pageId) => {
+        const navLinks = mainNav.querySelectorAll('a[data-page]');
+        const allTriggers = brandTitleLink ? [...navLinks, brandTitleLink] : [...navLinks];
+
+        allTriggers.forEach(link => {
+            if (link.dataset.page === pageId) {
+                link.classList.add('active'); // Assumes .active handles text color via CSS variables
+                if (link.tagName === 'A') link.classList.remove('text-theme-secondary');
+            } else {
+                link.classList.remove('active');
+                if (link.tagName === 'A') link.classList.add('text-theme-secondary');
+            }
+        });
+    };
+
+    const showPage = (pageId, fromHashChange = false) => {
         pageSections.forEach(section => {
             if (section.id === `${pageId}-content`) {
                 section.classList.remove('hidden');
@@ -305,25 +325,36 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Update active nav link
-        mainNav.querySelectorAll('.nav-link').forEach(link => {
-            if (link.dataset.page === pageId) {
-                link.classList.add('active'); // Uses CSS var for color
-                link.classList.remove('text-theme-secondary');
-            } else {
-                link.classList.remove('active'); // Correctly remove the 'active' class
-                link.classList.add('text-theme-secondary'); // Ensure default color is applied
-            }
-        });
-        window.scrollTo(0,0); // Scroll to top when changing "pages"
+        setActiveNavLink(pageId);
+
+        // Show/hide sticky category bar based on page
+        if (stickyCategoryBarWrapper) {
+            stickyCategoryBarWrapper.classList.toggle('hidden', pageId !== PAGE_IDS.MENU);
+        }
+
+        if (!fromHashChange) {
+            window.location.hash = pageId; // Update URL hash
+        }
+        
+        // Scroll to top only if not navigating from hash change (which might be a back/forward action)
+        // or if the target is the top of the page.
+        if (!fromHashChange || window.scrollY > 0) {
+            window.scrollTo(0, 0);
+        }
     };
 
-    mainNav.addEventListener('click', (e) => {
-        if (e.target.matches('.nav-link') && e.target.dataset.page) {
+    const handleNavigationClick = (e) => {
+        const targetLink = e.target.closest('a[data-page], h1[data-page]');
+        if (targetLink && targetLink.dataset.page) {
             e.preventDefault();
-            showPage(e.target.dataset.page);
+            showPage(targetLink.dataset.page);
         }
-    });
+    };
+
+    mainNav.addEventListener('click', handleNavigationClick);
+    if (brandTitleLink) {
+        brandTitleLink.addEventListener('click', handleNavigationClick);
+    }
 
     const init = async () => {
         try {
@@ -356,8 +387,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (settingsError) { console.error("Failed to load site accent color:", settingsError); }
             
-            renderMenu();
-            showPage('menu'); // Show menu page by default
+            renderMenu(); // Render menu data first
+            handleHashNavigation(); // Then determine which page to show based on hash or default
 
         } catch (error) {
             console.error("Failed to load initial data:", error);
@@ -366,6 +397,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     };
+
+    const handleHashNavigation = () => {
+        const hash = window.location.hash.substring(1);
+        const validPages = Object.values(PAGE_IDS);
+        if (hash && validPages.includes(hash)) {
+            showPage(hash, true); // Pass true to indicate it's from hash change
+        } else {
+            showPage(PAGE_IDS.MENU, true); // Default to menu
+        }
+    };
+
+    // Listen for hash changes (browser back/forward)
+    window.addEventListener('hashchange', handleHashNavigation);
 
     init();
 });
