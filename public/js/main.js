@@ -100,21 +100,21 @@ document.addEventListener('DOMContentLoaded', () => {
         finalItems.forEach(item => {
             const card = document.createElement('div');
             let cardBaseClasses = 'bg-theme-secondary rounded-lg overflow-hidden shadow-lg border border-theme'; // Use theme classes
-            let toggleClasses = 'p-4 flex justify-between items-center accordion-toggle cursor-pointer';
+            let toggleClasses = 'p-3 sm:p-4 flex justify-between items-center accordion-toggle cursor-pointer'; // Reduced padding
             let soldOutOverlayHTML = '';
             let soldOutTagHTML = '';
-            let imageClasses = 'w-full h-48 object-cover';
-            let accordionArrowHTML = `<svg class="w-6 h-6 text-theme-secondary transform transition-transform duration-300 accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
+            let imageClasses = 'w-full h-36 sm:h-40 object-cover'; // Reduced image height
+            let accordionArrowHTML = `<svg class="w-5 h-5 text-theme-secondary transform transition-transform duration-300 accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`; // Smaller arrow
             
-            const priceHTML = `<p class="font-semibold text-theme-secondary text-lg">₹${parseFloat(item.price).toFixed(2)}</p>`;
+            const priceHTML = `<p class="font-semibold text-theme-secondary text-md sm:text-lg">₹${parseFloat(item.price).toFixed(2)}</p>`; // Adjusted price font size
 
             if (!item.isAvailable) {
                 cardBaseClasses += ' is-sold-out';
                 imageClasses += ' filter grayscale opacity-60';
-                soldOutTagHTML = `<span class="text-xs font-bold uppercase px-3 py-1.5 rounded-md bg-red-600 text-white">Sold Out</span>`;
+                soldOutTagHTML = `<span class="text-xs font-bold uppercase px-2 py-1 rounded-md bg-red-600 text-white">Sold Out</span>`; // Slightly smaller sold out tag
                 soldOutOverlayHTML = `
                     <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10 pointer-events-none">
-                        <span class="text-white text-3xl font-bold uppercase tracking-wider transform -rotate-12 border-4 border-white px-4 py-2 rounded shadow-lg">Sold Out</span>
+                        <span class="text-white text-2xl sm:text-3xl font-bold uppercase tracking-wider transform -rotate-12 border-2 sm:border-4 border-white px-3 py-1 sm:px-4 sm:py-2 rounded shadow-lg">Sold Out</span>
                     </div>
                 `;
             }
@@ -122,15 +122,15 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = cardBaseClasses;
             card.innerHTML = `
                 <div class="${toggleClasses}">
-                    <div class="flex-grow">
-                        <div class="flex items-center gap-3">
-                            <div title="${item.isVeg ? 'Veg' : 'Non-Veg'}" class="w-5 h-5 border-2 ${item.isVeg ? 'border-green-500' : 'border-red-500'} flex items-center justify-center flex-shrink-0">
-                                <div class="w-2.5 h-2.5 ${item.isVeg ? 'bg-green-500' : 'bg-red-500'} rounded-full"></div>
+                    <div class="flex-grow mr-2">
+                        <div class="flex items-center gap-2">
+                            <div title="${item.isVeg ? 'Veg' : 'Non-Veg'}" class="w-4 h-4 border-2 ${item.isVeg ? 'border-green-500' : 'border-red-500'} flex items-center justify-center flex-shrink-0">
+                                <div class="w-2 h-2 ${item.isVeg ? 'bg-green-500' : 'bg-red-500'} rounded-full"></div>
                             </div>
-                            <h3 class="font-bold text-lg text-theme-primary">${item.name}</h3>
+                            <h3 class="font-bold text-md sm:text-lg text-theme-primary leading-tight">${item.name}</h3>
                         </div>
                     </div>
-                    <div class="flex items-center gap-x-3 text-theme-primary">
+                    <div class="flex items-center gap-x-2 text-theme-primary flex-shrink-0">
                         ${priceHTML}
                         ${soldOutTagHTML}
                         ${accordionArrowHTML}
@@ -139,8 +139,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="accordion-content relative">
                     ${soldOutOverlayHTML}
                     <img src="${item.image}" alt="${item.name}" class="${imageClasses}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/f0f0f0/333333?text=Image+Not+Found';">
-                    <div class="p-4">
-                        <p class="text-theme-secondary text-base">${item.description}</p>
+                    <div class="p-3 sm:p-4">
+                        <p class="text-theme-secondary text-sm sm:text-base">${item.description}</p>
                     </div>
                 </div>
             `;
