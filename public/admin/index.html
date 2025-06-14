@@ -31,10 +31,7 @@
             <div class="flex-grow overflow-x-auto min-w-0 whitespace-nowrap">
                 <nav id="admin-tabs" class="-mb-px flex space-x-4 sm:space-x-8 h-full items-center" aria-label="Tabs">
                     <button data-tab-target="#edit-menu-section" class="admin-tab admin-tab-active" aria-current="page">
-                        Update Menu
-                    </button>
-                    <button data-tab-target="#add-item-section" class="admin-tab admin-tab-inactive">
-                        Add New Item
+                        Menu
                     </button>
                     <button data-tab-target="#manage-categories-section" class="admin-tab admin-tab-inactive">
                         Manage Categories
@@ -57,47 +54,17 @@
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-[1.5rem]">
         <main>
             <!-- Edit Menu Items Section (Visible by default) -->
-            <section id="edit-menu-section" class="admin-tab-content bg-white border border-gray-200 rounded-lg shadow-lg p-6 mb-12">
-                 <h3 class="font-brand text-2xl mb-4 text-gray-800">Edit Menu Items</h3>
+            <section id="edit-menu-section" class="admin-tab-content bg-white border border-gray-200 rounded-lg shadow-lg p-4 sm:p-6 mb-12">
+                 <div class="flex justify-between items-center mb-4 sm:mb-6 border-b border-gray-300 pb-3">
+                    <h3 class="font-brand text-xl sm:text-2xl text-gray-800">Menu Items</h3>
+                    <button id="global-add-item-button" class="btn-primary text-sm flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                        Add Item
+                    </button>
+                 </div>
                  <div id="admin-menu-list" class="space-y-4">
                     <p class="text-gray-500">Loading menu items...</p>
                 </div>
-            </section>
-
-            <section id="add-item-section" class="admin-tab-content hidden bg-white p-6 sm:p-8 rounded-lg shadow-lg border border-gray-200 mb-12">
-                <h3 class="font-brand text-2xl mb-6 border-b border-gray-300 pb-4 text-gray-800">Add New Item</h3>
-                <form id="add-item-form" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="item-name" class="block text-sm font-medium text-gray-600 mb-1">Name</label>
-                            <input type="text" id="item-name" class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500">
-                        </div>
-                        <div>
-                           <label for="item-category-select" class="block text-sm font-medium text-gray-600 mb-1">Category</label>
-                           <select id="item-category-select" class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500"></select>
-                        </div>
-                    </div>
-                    <div>
-                        <label for="item-description" class="block text-sm font-medium text-gray-600 mb-1">Description</label>
-                        <textarea id="item-description" rows="3" class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500"></textarea>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="item-price" class="block text-sm font-medium text-gray-600 mb-1">Price</label>
-                            <input type="number" id="item-price" step="0.01" class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500">
-                        </div>
-                        <div>
-                            <label for="item-dietary-select" class="block text-sm font-medium text-gray-600 mb-1">Dietary Type</label>
-                            <select id="item-dietary-select" class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500">
-                                <option value="true">Veg</option>
-                                <option value="false">Non-Veg</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="pt-4">
-                        <button type="submit" class="btn-primary">Add Item to Menu</button>
-                    </div>
-                </form>
             </section>
 
             <section id="manage-categories-section" class="admin-tab-content hidden bg-white border border-gray-200 rounded-lg shadow-lg p-6">
@@ -145,6 +112,59 @@
                 </form>
             </section>
         </main>
+
+        <!-- Add/Edit Item Modal -->
+        <div id="add-edit-item-modal" class="fixed inset-0 z-50 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden">
+            <div class="relative mx-auto p-5 border w-full max-w-xl shadow-lg rounded-md bg-white">
+                <div class="flex justify-between items-center border-b pb-3 mb-4">
+                    <h4 id="modal-title" class="text-xl font-brand text-gray-700">Add New Item</h4>
+                    <button id="modal-close-button" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+                </div>
+                <form id="modal-item-form" class="space-y-4">
+                    <input type="hidden" id="modal-item-index"> <!-- For editing -->
+                    <div>
+                        <label for="modal-item-name" class="block text-sm font-medium text-gray-600 mb-1">Name</label>
+                        <input type="text" id="modal-item-name" required class="w-full px-3 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+                    </div>
+                    <div>
+                       <label for="modal-item-category-select" class="block text-sm font-medium text-gray-600 mb-1">Category</label>
+                       <select id="modal-item-category-select" required class="w-full px-3 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500"></select>
+                    </div>
+                    <div>
+                        <label for="modal-item-description" class="block text-sm font-medium text-gray-600 mb-1">Description</label>
+                        <textarea id="modal-item-description" rows="3" required class="w-full px-3 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="modal-item-price" class="block text-sm font-medium text-gray-600 mb-1">Price (₹)</label>
+                            <input type="number" id="modal-item-price" step="0.01" min="0" required class="w-full px-3 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label for="modal-item-dietary-select" class="block text-sm font-medium text-gray-600 mb-1">Dietary Type</label>
+                            <select id="modal-item-dietary-select" class="w-full px-3 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+                                <option value="true">Veg</option>
+                                <option value="false">Non-Veg</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="modal-item-image" class="block text-sm font-medium text-gray-600 mb-1">Image URL (Optional)</label>
+                        <input type="url" id="modal-item-image" placeholder="https://example.com/image.jpg" class="w-full px-3 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+                    </div>
+                     <div>
+                        <label for="modal-item-is-available-select" class="block text-sm font-medium text-gray-600 mb-1">Availability</label>
+                        <select id="modal-item-is-available-select" class="w-full px-3 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+                            <option value="true">Available</option>
+                            <option value="false">Unavailable (Sold Out)</option>
+                        </select>
+                    </div>
+                    <div class="pt-3 flex justify-end space-x-3">
+                        <button type="button" id="modal-cancel-button" class="btn-neutral">Cancel</button>
+                        <button type="submit" id="modal-save-button" class="btn-primary">Save Item</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </body>
 </html>

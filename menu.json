@@ -1,7 +1,7 @@
 [
   {
     "name": "Idly (2 pcs)",
-    "price": 40,
+    "price": 50,
     "category": "Breakfast",
     "description": "Soft, fluffy steamed rice cakes, a staple of South Indian breakfast, served with sambar and chutney.",
     "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?q=80&w=1974&auto=format&fit=crop",
@@ -36,12 +36,12 @@
     "isAvailable": false
   },
   {
-    "name": "Chiku",
-    "description": "Chickeesds",
-    "price": 300,
-    "category": "Lunch",
-    "isAvailable": true,
-    "isVeg": false,
-    "image": "https://placehold.co/600x400/333333/FBBF24?text=Chiku"
+    "name": "sambar",
+    "category": "Breakfast",
+    "description": "dfv",
+    "price": 45,
+    "isVeg": true,
+    "isAvailable": false,
+    "image": "https://placehold.co/600x400/333333/FBBF24?text=sambar"
   }
 ]
