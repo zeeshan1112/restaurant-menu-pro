@@ -28,9 +28,9 @@
     <!-- Global body background and text color are now handled by src/input.css -->
     <!-- Page-specific font-family applied via inline style to ensure it takes precedence if needed -->
 
-    <header class="shadow-sm sticky top-0 z-40 h-24 flex items-center header-themed">
+    <header class="shadow-sm sticky top-0 z-40 h-[6.5rem] sm:h-24 flex items-center header-themed">
         <div class="container mx-auto px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between">
-            <div class="text-center sm:text-left mb-2 sm:mb-0">
+            <div class="text-center sm:text-left mb-2 sm:mb-0 pt-3 sm:pt-0">
                 <h1 class="font-brand text-3xl md:text-4xl font-bold text-theme-accent cursor-pointer" data-page="menu">Virundhu Mane</h1>
                 <p class="text-sm text-theme-secondary">Flavors of Madurai</p>
             </div>
@@ -53,9 +53,9 @@
     </header>
 
     <!-- Menu Section (Default Visible) -->
-    <section id="menu-content" class="page-content py-12 md:py-16">
+    <section id="menu-content" class="page-content py-6 md:py-16">
         <div class="container mx-auto px-6 lg:px-8">
-            <div class="flex flex-row items-center justify-between mb-8">
+            <div class="flex flex-row items-center justify-between mb-4 sm:mb-8">
                 <h2 class="font-brand text-md sm:text-xl md:text-2xl font-bold text-theme-accent text-left mb-0 mr-3">Discover Our Menu</h2>
                 <div class="flex items-center space-x-3">
                      <div class="flex items-center space-x-2">
@@ -74,7 +74,7 @@
             </div>
 
             <!-- Sticky Tab Bar Container - Positioned below the header (h-24 = 6rem) -->
-            <div id="sticky-category-bar-wrapper" class="sticky top-24 z-30 py-3 shadow-sm -mx-6 px-6 border-b mb-8 bg-theme-primary border-theme relative">
+            <div id="sticky-category-bar-wrapper" class="sticky top-24 z-30 py-2 sm:py-3 shadow-sm -mx-6 px-6 border-b mb-8 bg-theme-primary border-theme">
                 <button id="scroll-cat-left" aria-label="Scroll categories left" class="absolute left-1 top-1/2 -translate-y-1/2 z-10 p-2 bg-theme-primary rounded-full hidden text-theme-accent transition-opacity duration-200">
                     <i class="fas fa-chevron-left fa-fw"></i>
                 </button>
