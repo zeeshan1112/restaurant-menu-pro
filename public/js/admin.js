@@ -199,8 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!adminMenuList) return; // Only render if the list element exists
         adminMenuList.innerHTML = '';
         const header = document.createElement('div');
-        header.className = 'hidden md:grid md:grid-cols-6 gap-4 items-center border-b-2 border-gray-300 pb-2 font-bold text-sm text-gray-500 uppercase tracking-wider';
-        header.innerHTML = `<span>Name</span><span>Category</span><span>Price</span><span>Dietary</span><span>Status</span><span>Action</span>`;
+        header.className = 'hidden md:grid md:grid-cols-6 gap-x-3 items-center border-b-2 border-gray-300 pb-2 font-bold text-sm text-gray-500 uppercase tracking-wider';
+        header.innerHTML = `<span>Name</span><span>Category</span><span>Price</span><span>Dietary</span><span>Status</span><span class="text-right">Actions</span>`;
         adminMenuList.appendChild(header);
 
         if (!Array.isArray(menuData) || menuData.length === 0) return;
@@ -208,8 +208,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemDiv = document.createElement('div');
             // Adjusted grid for edit/delete buttons
             itemDiv.className = 'grid grid-cols-2 md:grid-cols-6 gap-x-3 gap-y-2 items-center border-b border-gray-300 py-3';
-            
-            const commonInputClasses = 'w-full px-3 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition';
 
             itemDiv.innerHTML = `
                 <span class="font-medium text-gray-700 col-span-2 md:col-span-1">${item.name}</span>
