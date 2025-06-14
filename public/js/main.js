@@ -174,7 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = document.createElement('button');
             button.textContent = category;
             // Base classes for all tabs
-            let tabClasses = 'px-3 py-3 text-base md:text-lg focus:outline-none transition-all duration-300 ease-in-out';
+            // Reduced padding (px-2 py-2) and font size (text-sm) for mobile, slightly larger for md and up
+            let tabClasses = 'px-2 py-2 text-sm md:px-3 md:py-3 md:text-base focus:outline-none transition-all duration-300 ease-in-out';
             if (category === activeCategory) {
                 tabClasses += ' text-theme-accent border-b-2 border-theme-accent font-semibold';
             } else {
