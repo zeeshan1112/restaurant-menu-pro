@@ -24,9 +24,16 @@
         }
     </style>
 </head>
-<body class="scroll-smooth" style="font-family: 'Roboto', sans-serif;">
+<body class="scroll-smooth bg-theme-primary text-theme-primary" style="font-family: 'Roboto', sans-serif;">
     <!-- Global body background and text color are now handled by src/input.css -->
     <!-- Page-specific font-family applied via inline style to ensure it takes precedence if needed -->
+
+    <!-- Announcement Bar -->
+    <div id="announcement-bar" class="hidden text-white p-3 text-center text-sm relative z-50">
+        <span id="announcement-text-display" class="mr-6"></span>
+        <button id="close-announcement-button" aria-label="Close announcement" class="absolute top-1/2 right-3 -translate-y-1/2 text-xl leading-none font-semibold hover:text-amber-200">&times;</button>
+    </div>
+
 
     <header class="shadow-sm sticky top-0 z-40 h-[6.5rem] sm:h-24 flex items-center header-themed">
         <div class="container mx-auto px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between">

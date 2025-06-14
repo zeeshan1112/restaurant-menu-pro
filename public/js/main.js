@@ -18,6 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const brandTitleLink = document.querySelector('h1.font-brand[data-page="menu"]'); // For navigation
     const scrollCatLeft = document.getElementById('scroll-cat-left');
     const scrollCatRight = document.getElementById('scroll-cat-right');
+    // Announcement Bar Elements
+    const announcementBar = document.getElementById('announcement-bar');
+    const announcementTextDisplay = document.getElementById('announcement-text-display');
+    const closeAnnouncementButton = document.getElementById('close-announcement-button');
+
 
     if (!menuContentSection || !categoryTabsContainer || !vegOnlySwitch || !nonVegOnlySwitch || !mainNav || !faqAccordionContainer || !themeToggleButton || !themeIconLight || !themeIconDark || !stickyCategoryBarWrapper || !scrollCatLeft || !scrollCatRight) {
         console.warn('One or more essential elements are missing. Script functionalities might be limited.');
@@ -39,6 +44,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentYearEl) {
         currentYearEl.textContent = new Date().getFullYear();
     }
+
+    // --- ANNOUNCEMENT BAR LOGIC ---
+    const displayAnnouncement = (text, enabled, accentColor) => {
+        if (!announcementBar || !announcementTextDisplay) return; // Ensure elements exist
+
+        if (enabled && text) {
+            if (accentColor) announcementBar.style.backgroundColor = accentColor;
+            announcementTextDisplay.textContent = text;
+            announcementBar.classList.remove('hidden');
+        } else {
+            announcementBar.classList.add('hidden');
+        }
+    };
 
     // --- DYNAMIC ACCENT COLOR APPLICATION (PUBLIC) ---
     const applyPublicAccentColor = (color, hoverColor) => {
@@ -400,6 +418,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     const init = async () => {
+        // Setup close announcement button listener if elements exist
+        if (closeAnnouncementButton && announcementBar) {
+            closeAnnouncementButton.addEventListener('click', () => {
+                announcementBar.classList.add('hidden');
+            });
+        }
+
         try {
             const [menuResponse, categoriesResponse] = await Promise.all([
                 fetch('/.netlify/functions/menu'), 
@@ -427,8 +452,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (settingsResponse.ok) {
                     const siteSettings = await settingsResponse.json();
                     applyPublicAccentColor(siteSettings.accentColor, siteSettings.accentColorHover);
+                    // Display announcement based on fetched settings
+                    displayAnnouncement(siteSettings.announcementText, siteSettings.announcementEnabled, siteSettings.accentColor);
+                } else {
+                    console.warn('Could not retrieve site settings or response not OK.');
+                    if (announcementBar) announcementBar.classList.add('hidden'); // Ensure hidden
                 }
-            } catch (settingsError) { console.error("Failed to load site accent color:", settingsError); }
+            } catch (settingsError) {
+                console.error("Failed to load site settings:", settingsError);
+                if (announcementBar) announcementBar.classList.add('hidden'); // Ensure hidden on error
+            }
             
             renderMenu(); // Render menu data first
             handleHashNavigation(); // Then determine which page to show based on hash or default

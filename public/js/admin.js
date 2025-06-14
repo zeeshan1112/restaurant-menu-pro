@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const siteSettingsForm = document.getElementById('site-settings-form');
     const accentColorPicker = document.getElementById('accent-color-picker');
     const accentColorHexInput = document.getElementById('accent-color-hex');
+    const announcementTextInput = document.getElementById('announcement-text-input');
+    const enableAnnouncementCheckbox = document.getElementById('enable-announcement-checkbox');
     const addItemDietarySelect = document.getElementById('item-dietary-select');
     const adminBrandTitle = document.getElementById('admin-brand-title');
     let menuData = [];
@@ -419,12 +421,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 accentColorPicker.value = settings.accentColor;
                 accentColorHexInput.value = settings.accentColor;
             }
+            if (settings.announcementText !== undefined && announcementTextInput) {
+                announcementTextInput.value = settings.announcementText;
+            }
+            if (settings.announcementEnabled !== undefined && enableAnnouncementCheckbox) {
+                enableAnnouncementCheckbox.checked = settings.announcementEnabled;
+            }
             applyAccentColorToAdmin(settings.accentColor, settings.accentColorHover);
         } catch (error) {
             console.error("Error loading site settings:", error);
             showToast('Could not load site settings.', 'error');
         }
     };
+
+    // Ensure site settings are loaded which includes announcement fields
 
     if (siteSettingsForm && accentColorPicker && accentColorHexInput) {
         accentColorPicker.addEventListener('input', (e) => {
@@ -439,15 +449,24 @@ document.addEventListener('DOMContentLoaded', () => {
         siteSettingsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const newAccentColor = accentColorHexInput.value;
+            const announcementText = announcementTextInput ? announcementTextInput.value : '';
+            const announcementEnabled = enableAnnouncementCheckbox ? enableAnnouncementCheckbox.checked : false;
+
             if (!newAccentColor || !/^#[0-9A-F]{6}$/i.test(newAccentColor)) {
                 showToast('Please enter a valid 6-digit hex color (e.g., #F59E0B).', 'error');
                 return;
             }
 
+            const settingsToSave = {
+                accentColor: newAccentColor,
+                announcementText: announcementText,
+                announcementEnabled: announcementEnabled
+            };
+
             try {
                 const response = await fetch('/.netlify/functions/settings', {
-                    method: 'POST',
-                    body: JSON.stringify({ accentColor: newAccentColor }) // Let backend derive hover
+                    method: 'POST', // Body will now include announcement settings
+                    body: JSON.stringify(settingsToSave) 
                 });
                 const result = await response.json();
                 if (!response.ok) throw new Error(result.message || 'Failed to save accent color.');
@@ -458,7 +477,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast(result.message, toastType); 
 
                 // Always apply to current session for immediate feedback
-                applyAccentColorToAdmin(result.settings.accentColor, result.settings.accentColorHover); 
+                if (result.settings) {
+                    applyAccentColorToAdmin(result.settings.accentColor, result.settings.accentColorHover);
+                    // No need to update announcement fields here as they don't have immediate visual admin UI impact beyond the form itself
+                }
             } catch (error) {
                 showToast(`Error saving accent color: ${error.message}`, 'error');
                 console.error("Error saving accent color:", error);
