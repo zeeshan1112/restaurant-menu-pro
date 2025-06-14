@@ -166,6 +166,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (adminBrandTitle) {
             adminBrandTitle.style.color = color;
         }
+
+        // Apply accent color to specific section titles and labels
+        const sectionTitles = [
+            document.querySelector('#edit-menu-section h3'),
+            document.querySelector('#manage-categories-section h3'),
+            document.querySelector('#site-settings-section h3'),
+            document.querySelector('#manage-categories-section .md\\:w-1\\/3 > label') // Label for "Existing Categories"
+        ];
+
+        sectionTitles.forEach(titleElement => {
+            if (titleElement) titleElement.style.color = color;
+        });
         // Active tab styling is handled by CSS variables or direct style in tab click handler
     };
     // --- HELPER & RENDER FUNCTIONS ---
