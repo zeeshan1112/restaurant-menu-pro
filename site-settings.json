@@ -2,5 +2,6 @@
   "accentColor": "#ff4015",
   "announcementText": "Prices are increasing from 1 July!",
   "announcementEnabled": true,
+  "sectionTitleFont": "'Dancing Script', cursive",
   "accentColorHover": "#e53912"
 }
