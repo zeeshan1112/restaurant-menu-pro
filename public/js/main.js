@@ -81,12 +81,18 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- DYNAMIC ACCENT COLOR APPLICATION (PUBLIC) ---
-    const applyPublicAccentColor = (color, hoverColor) => {
-        document.documentElement.style.setProperty('--accent-color', color);
-        document.documentElement.style.setProperty('--accent-color-hover', hoverColor);
+    const applyPublicSiteStyles = (settings) => {
+        // Accent Color
+        document.documentElement.style.setProperty('--accent-color', settings.accentColor);
+        document.documentElement.style.setProperty('--accent-color-hover', settings.accentColorHover);
         // If theme toggle icons need to change color based on accent:
-        if (themeIconLight) themeIconLight.style.color = color;
+        if (themeIconLight) themeIconLight.style.color = settings.accentColor;
         // Note: themeIconDark uses indigo, might want to keep it or make it themeable too
+
+        // Section Title Font
+        if (settings.sectionTitleFont) {
+            document.documentElement.style.setProperty('--section-title-font-family', settings.sectionTitleFont);
+        }
     };
 
 
@@ -473,8 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const settingsResponse = await fetch('/.netlify/functions/settings');
                 if (settingsResponse.ok) {
                     const siteSettings = await settingsResponse.json();
-                    applyPublicAccentColor(siteSettings.accentColor, siteSettings.accentColorHover);
-                    // Display announcement based on fetched settings
+                    applyPublicSiteStyles(siteSettings); // Apply all relevant styles
                     displayAnnouncement(siteSettings.announcementText, siteSettings.announcementEnabled, siteSettings.accentColor);
                 } else {
                     console.warn('Could not retrieve site settings or response not OK.');

@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const accentColorHexInput = document.getElementById('accent-color-hex');
     const announcementTextInput = document.getElementById('announcement-text-input');
     const enableAnnouncementCheckbox = document.getElementById('enable-announcement-checkbox');
+    const sectionTitleFontSelect = document.getElementById('section-title-font-select');
     // const addItemDietarySelect = document.getElementById('item-dietary-select'); // Removed, use modal's select
     const adminBrandTitle = document.getElementById('admin-brand-title');
 
@@ -150,6 +151,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const applyAccentColorToAdmin = (color, hoverColor) => {
         document.documentElement.style.setProperty('--accent-color', color);
         document.documentElement.style.setProperty('--accent-color-hover', hoverColor);
+
+        // Apply the section title font to the admin dashboard as well
+        const currentSectionTitleFont = sectionTitleFontSelect ? sectionTitleFontSelect.value : "'Playfair Display', serif";
+        document.documentElement.style.setProperty('--section-title-font-family', currentSectionTitleFont);
+
         
         // Style for all .btn-primary elements.
         // Their background color is assumed to be var(--accent-color) via CSS,
@@ -503,7 +509,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (settings.announcementEnabled !== undefined && enableAnnouncementCheckbox) {
                 enableAnnouncementCheckbox.checked = settings.announcementEnabled;
             }
-            applyAccentColorToAdmin(settings.accentColor, settings.accentColorHover);
+            if (settings.sectionTitleFont !== undefined && sectionTitleFontSelect) {
+                sectionTitleFontSelect.value = settings.sectionTitleFont;
+            }
+            // Pass the full settings object or individual font setting to applyAccentColorToAdmin
+            // For simplicity, applyAccentColorToAdmin will now read from sectionTitleFontSelect directly
+            // or we can pass it. Let's ensure it's available when called.
+            // The call below will now also apply the font.
+            applyAccentColorToAdmin(settings.accentColor, settings.accentColorHover); 
         } catch (error) {
             console.error("Error loading site settings:", error);
             showToast('Could not load site settings.', 'error');
@@ -527,6 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const newAccentColor = accentColorHexInput.value;
             const announcementText = announcementTextInput ? announcementTextInput.value : '';
             const announcementEnabled = enableAnnouncementCheckbox ? enableAnnouncementCheckbox.checked : false;
+            const sectionTitleFont = sectionTitleFontSelect ? sectionTitleFontSelect.value : "'Playfair Display', serif";
 
             if (!newAccentColor || !/^#[0-9A-F]{6}$/i.test(newAccentColor)) {
                 showToast('Please enter a valid 6-digit hex color (e.g., #F59E0B).', 'error');
@@ -536,7 +550,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const settingsToSave = {
                 accentColor: newAccentColor,
                 announcementText: announcementText,
-                announcementEnabled: announcementEnabled
+                announcementEnabled: announcementEnabled,
+                sectionTitleFont: sectionTitleFont
             };
 
             try {
@@ -554,8 +569,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Always apply to current session for immediate feedback
                 if (result.settings) {
+                    // applyAccentColorToAdmin will be called, and it will pick up the
+                    // new font from sectionTitleFontSelect if it was part of result.settings
+                    // and updated the select's value.
                     applyAccentColorToAdmin(result.settings.accentColor, result.settings.accentColorHover);
-                    // No need to update announcement fields here as they don't have immediate visual admin UI impact beyond the form itself
                 }
             } catch (error) {
                 showToast(`Error saving accent color: ${error.message}`, 'error');

@@ -7,7 +7,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'brand': ['"Playfair Display"', 'serif'],
+        'brand': ['var(--section-title-font-family, "Playfair Display")', 'serif'],
         'sans': ['"Roboto"', 'sans-serif'],
         'jakarta': ['"Plus Jakarta Sans"', 'sans-serif'],
       },

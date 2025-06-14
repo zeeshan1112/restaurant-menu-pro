@@ -81,6 +81,11 @@ exports.handler = async (event, context) => {
             // Automatically derive hover color
             newSettingsData.accentColorHover = darkenColor(newSettingsData.accentColor, 10);
 
+            // Ensure sectionTitleFont is handled
+            if (newSettingsData.sectionTitleFont === undefined) {
+                // If not explicitly sent, you might want to fetch existing settings and merge,
+                // or ensure the frontend always sends it. For now, we assume it's part of the payload.
+            }
             let writeSuccessful = false;
             let serverMessage = 'Accent color updated for your current session.';
             if (isLocalDev) {
