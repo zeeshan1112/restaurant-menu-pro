@@ -198,29 +198,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderAdminMenu = () => {
         if (!adminMenuList) return; // Only render if the list element exists
         adminMenuList.innerHTML = '';
-        const header = document.createElement('div');
-        header.className = 'hidden md:grid md:grid-cols-6 gap-x-3 items-center border-b-2 border-gray-300 pb-2 font-bold text-sm text-gray-500 uppercase tracking-wider';
-        header.innerHTML = `<span>Name</span><span>Category</span><span>Price</span><span>Dietary</span><span>Status</span><span class="text-right">Actions</span>`;
-        adminMenuList.appendChild(header);
+        // Desktop header
+        const desktopHeader = document.createElement('div');
+        desktopHeader.className = 'hidden md:grid md:grid-cols-6 gap-x-3 items-center border-b-2 border-gray-300 pb-2 font-bold text-sm text-gray-500 uppercase tracking-wider';
+        desktopHeader.innerHTML = `<span>Name</span><span>Category</span><span>Price</span><span>Dietary</span><span>Status</span><span class="text-right">Actions</span>`;
+        adminMenuList.appendChild(desktopHeader);
 
         if (!Array.isArray(menuData) || menuData.length === 0) return;
         menuData.forEach((item, index) => {
             const itemDiv = document.createElement('div');
             // Adjusted grid for edit/delete buttons
-            itemDiv.className = 'grid grid-cols-2 md:grid-cols-6 gap-x-3 gap-y-2 items-center border-b border-gray-300 py-3';
+            // Mobile: 2 columns (info, actions). Desktop: 6 columns. Further reduced vertical padding.
+            itemDiv.className = 'grid grid-cols-[1fr_auto] md:grid-cols-6 gap-x-2 sm:gap-x-3 gap-y-1.5 sm:gap-y-1 items-center border-b border-gray-300 py-1 sm:py-2';
 
             itemDiv.innerHTML = `
-                <span class="font-medium text-gray-700 col-span-2 md:col-span-1">${item.name}</span>
-                <span class="text-gray-600 text-sm">${item.category}</span>
-                <span class="text-gray-600 text-sm">₹${parseFloat(item.price).toFixed(2)}</span>
-                <span class="text-gray-600 text-sm">${item.isVeg ? 'Veg' : 'Non-Veg'}</span>
-                <span class="${item.isAvailable ? 'text-green-600' : 'text-red-600'} text-sm font-semibold">${item.isAvailable ? 'Available' : 'Unavailable'}</span>
-                <div class="flex items-center justify-end space-x-2 col-span-2 md:col-span-1">
-                    <button class="edit-item-btn text-amber-600 hover:text-amber-500 p-1.5 rounded hover:bg-amber-100 transition-colors" data-index="${index}" title="Edit Item">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                <!-- Mobile: Combined info, Desktop: Separate spans -->
+                <div class="md:col-span-1"> <!-- Name for Desktop -->
+                    <span class="font-medium text-gray-700 text-sm sm:text-base">${item.name}</span>
+                    <div class="text-xs text-gray-500 md:hidden"> <!-- Category, Price for Mobile -->
+                        ${item.category} &bull; ₹${parseFloat(item.price).toFixed(2)} &bull; ${item.isVeg ? 'Veg' : 'Non-Veg'} &bull; <span class="${item.isAvailable ? 'text-green-500' : 'text-red-500'}">${item.isAvailable ? 'Available' : 'Unavailable'}</span>
+                    </div>
+                </div>
+                <span class="hidden md:inline-block text-gray-600 text-sm">${item.category}</span>
+                <span class="hidden md:inline-block text-gray-600 text-sm">₹${parseFloat(item.price).toFixed(2)}</span>
+                <span class="hidden md:inline-block text-gray-600 text-sm">${item.isVeg ? 'Veg' : 'Non-Veg'}</span>
+                <span class="hidden md:inline-block ${item.isAvailable ? 'text-green-600' : 'text-red-500'} text-sm font-semibold ">${item.isAvailable ? 'Available' : 'Unavailable'}</span>
+                <div class="flex items-center justify-end space-x-0.5 sm:space-x-1 md:col-span-1">
+                    <button class="edit-item-btn text-amber-600 hover:text-amber-500 p-1 sm:p-1.5 rounded hover:bg-amber-100 transition-colors" data-index="${index}" title="Edit Item">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                     </button>
-                    <button class="delete-item-btn text-red-600 hover:text-red-500 p-1.5 rounded hover:bg-red-100 transition-colors" data-index="${index}" title="Delete Item">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    <button class="delete-item-btn text-red-600 hover:text-red-500 p-1 sm:p-1.5 rounded hover:bg-red-100 transition-colors" data-index="${index}" title="Delete Item">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     </button>
                 </div>
             `;
