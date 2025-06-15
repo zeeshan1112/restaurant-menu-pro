@@ -8,7 +8,7 @@ module.exports = {
     extend: {
       fontFamily: {
         'brand': ['var(--section-title-font-family, "Playfair Display")', 'serif'],
-        'sans': ['"Roboto"', 'sans-serif'],
+        'sans': ['var(--section-title-font-family, "Roboto")', 'sans-serif'], // Changed to use the CSS variable
         'jakarta': ['"Plus Jakarta Sans"', 'sans-serif'],
       },
       colors: {
