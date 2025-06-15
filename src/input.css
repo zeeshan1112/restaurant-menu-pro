@@ -2,8 +2,75 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom CSS Variables for Theming */
+:root {
+    --bg-primary: #f1f5f9;    /* slate-100 */
+    --bg-secondary: #ffffff; /* white */
+    --text-primary: #0f172a;   /* slate-900 */
+    --text-secondary: #64748b; /* slate-500 */
+    --border-color: #e2e8f0;   /* slate-200 */
+    --accent-color: #F59E0B; /* Tailwind amber-500 */
+    --accent-color-hover: #D97706; /* amber-600 */
+}
+
+html.dark {
+    --bg-primary: #1f2937;    /* Tailwind gray-800 */
+    --bg-secondary: #374151;  /* Tailwind gray-700 */
+    --text-primary: #f3f4f6;    /* Tailwind gray-100 */
+    --text-secondary: #d1d5db;  /* Tailwind gray-300 */
+    --border-color: #4b5563;   /* Tailwind gray-600 */
+    --accent-color: #F59E0B; /* Keeping amber-500 for dark, or could use amber-400 e.g. #FBBF24 */
+    --accent-color-hover: #FBBF24; /* amber-400 */
+}
+
+/* Apply base body styles using CSS variables */
+body {
+    /* font-family is set per page using inline styles or more specific selectors */
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s, color 0.3s;
+}
+
 /* Custom component styles for the new design */
 @layer components {
+    /* Theme aware utility classes (moved from index.html inline style) */
+    .bg-theme-primary { background-color: var(--bg-primary); }
+    .bg-theme-secondary { background-color: var(--bg-secondary); }
+    .text-theme-primary { color: var(--text-primary); }
+    .text-theme-secondary { color: var(--text-secondary); }
+    .text-theme-accent { color: var(--accent-color); }
+    .hover\:text-theme-accent-hover:hover { color: var(--accent-color-hover); }
+    .border-theme-accent { border-color: var(--accent-color); }
+    .border-theme { border-color: var(--border-color); }
+
+    /* Theme aware button */
+    .btn-primary {
+        @apply font-bold py-3 px-6 rounded-lg transition-colors duration-300 focus:outline-none;
+        background-color: var(--accent-color);
+        color: #111827; /* text-gray-900, for good contrast on amber */
+    }
+    .btn-primary:hover {
+        background-color: var(--accent-color-hover);
+    }
+    .btn-primary:focus { /* Replicates focus:ring-2 focus:ring-offset-2 focus:ring-THEME_ACCENT_COLOR */
+        box-shadow: 0 0 0 2px var(--bg-secondary), 0 0 0 4px var(--accent-color);
+    }
+
+    /* Theme aware neutral button (e.g., for logout) */
+    .btn-neutral {
+        @apply font-semibold py-2 px-4 rounded-lg transition-colors duration-300 focus:outline-none;
+        background-color: var(--bg-secondary); /* Or a slightly off-primary like slate-200/gray-700 */
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+    }
+    .btn-neutral:hover {
+        background-color: var(--border-color); /* Lighten/darken secondary or border */
+        color: var(--text-primary);
+    }
+    .btn-neutral:focus {
+        box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--accent-color); /* Focus ring with accent */
+    }
+
     .tab-active {
         @apply bg-amber-400 text-gray-900;
     }
@@ -14,5 +81,36 @@
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Theme aware header (moved from index.html inline style) */
+    .header-themed {
+        background-color: var(--bg-secondary);
+        border-bottom-color: var(--border-color);
+    }
+
+    /* Theme aware nav links (moved from index.html inline style) */
+    .nav-link-themed { color: var(--text-secondary); }
+    .nav-link-themed.active {
+        color: var(--accent-color);
+        @apply font-semibold; /* Ensure font-semibold is part of the themed active link */
+    }
+    .nav-link-themed:hover { color: var(--accent-color-hover); } /* Use hover accent color */
+
+    /* Theme aware admin tabs */
+    .admin-tab {
+        @apply whitespace-nowrap py-3 px-2 border-b-2 font-medium text-sm transition-colors duration-150;
+    }
+    .admin-tab-active {
+        border-color: var(--accent-color);
+        color: var(--accent-color);
+    }
+    .admin-tab-inactive {
+        border-color: transparent;
+        color: var(--text-secondary);
+    }
+    .admin-tab-inactive:hover {
+        color: var(--accent-color-hover);
+        border-color: var(--accent-color-hover); /* Or a lighter gray like var(--border-color) */
     }
 }

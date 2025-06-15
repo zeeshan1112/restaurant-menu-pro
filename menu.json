@@ -36,12 +36,12 @@
     "isAvailable": false
   },
   {
-    "name": "Chiku",
-    "description": "Chickeesds",
-    "price": 300,
-    "category": "Lunch",
-    "isAvailable": true,
-    "isVeg": false,
-    "image": "https://placehold.co/600x400/333333/FBBF24?text=Chiku"
+    "name": "sambar",
+    "category": "Breakfast",
+    "description": "dfv",
+    "price": 45,
+    "isVeg": true,
+    "isAvailable": false,
+    "image": "https://placehold.co/600x400/333333/FBBF24?text=sambar"
   }
 ]

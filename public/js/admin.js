@@ -15,12 +15,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const toastMessage = document.getElementById('toast-message');
     let toastTimeout;
     const adminMenuList = document.getElementById('admin-menu-list');
+    const globalAddItemButton = document.getElementById('global-add-item-button');
     const saveAllButton = document.getElementById('save-all-changes');
-    const addItemForm = document.getElementById('add-item-form');
+    // const addItemForm = document.getElementById('add-item-form'); // Removed
     const addCategoryForm = document.getElementById('add-category-form');
     const categoryListDiv = document.getElementById('category-list');
-    const addItemCategorySelect = document.getElementById('item-category-select');
-    const addItemDietarySelect = document.getElementById('item-dietary-select');
+    // const addItemCategorySelect = document.getElementById('item-category-select'); // Removed, use modal's select
+    // Site Settings Elements
+    const siteSettingsForm = document.getElementById('site-settings-form');
+    const accentColorPicker = document.getElementById('accent-color-picker');
+    const accentColorHexInput = document.getElementById('accent-color-hex');
+    const announcementTextInput = document.getElementById('announcement-text-input');
+    const enableAnnouncementCheckbox = document.getElementById('enable-announcement-checkbox');
+    const sectionTitleFontSelect = document.getElementById('section-title-font-select');
+    // const addItemDietarySelect = document.getElementById('item-dietary-select'); // Removed, use modal's select
+    const adminBrandTitle = document.getElementById('admin-brand-title');
+
+    // Modal Elements
+    const addItemModal = document.getElementById('add-edit-item-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalItemForm = document.getElementById('modal-item-form');
+    const modalCloseButton = document.getElementById('modal-close-button');
+    const modalCancelButton = document.getElementById('modal-cancel-button');
+    // Modal form fields will be selected inside functions as needed or globally if preferred
+
     let menuData = [];
     let categoriesData = [];
     let isMenuDirty = false;
@@ -55,14 +73,19 @@ document.addEventListener('DOMContentLoaded', () => {
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 // Deactivate all tabs
+                const currentAccentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
+
                 tabs.forEach(t => {
-                    t.classList.remove('border-amber-500', 'text-amber-600');
+                    t.style.borderColor = 'transparent'; // Use style for dynamic color
+                    t.style.color = ''; // Revert to CSS class color
                     t.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                    t.classList.remove('text-amber-600'); // Remove old hardcoded class if any
                     t.removeAttribute('aria-current');
                 });
 
                 // Activate clicked tab
-                tab.classList.add('border-amber-500', 'text-amber-600');
+                tab.style.borderColor = currentAccentColor;
+                tab.style.color = currentAccentColor; // Or a darker shade if preferred
                 tab.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
                 tab.setAttribute('aria-current', 'page');
 
@@ -109,6 +132,60 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Helper function to determine text color (black or white) based on background
+    // (Copied from main.js for use in admin panel)
+    const getTextColorForBackground = (hexBgColor) => {
+        if (!hexBgColor) return '#FFFFFF'; // Default to white if no color provided
+
+        const hex = hexBgColor.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+
+        // Calculate luminance using the YIQ formula
+        const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+        return (yiq >= 128) ? '#000000' : '#FFFFFF'; // Return black for light backgrounds, white for dark
+    };
+
+    // --- DYNAMIC ACCENT COLOR APPLICATION (ADMIN) ---
+    const applyAccentColorToAdmin = (color, hoverColor) => {
+        document.documentElement.style.setProperty('--accent-color', color);
+        document.documentElement.style.setProperty('--accent-color-hover', hoverColor);
+
+        // Apply the section title font to the admin dashboard as well
+        const currentSectionTitleFont = sectionTitleFontSelect ? sectionTitleFontSelect.value : "'Playfair Display', serif";
+        document.documentElement.style.setProperty('--section-title-font-family', currentSectionTitleFont);
+
+        
+        // Style for all .btn-primary elements.
+        // Their background color is assumed to be var(--accent-color) via CSS,
+        // or explicitly set for specific buttons like 'saveAllButton'.
+        // We will now make their text color adaptive.
+        const adaptiveTextColor = getTextColorForBackground(color);
+        document.querySelectorAll('.btn-primary').forEach(button => {
+            if (button.id === 'save-all-changes') { // This is the saveAllButton (Publish button)
+                button.style.backgroundColor = color; // Explicitly set background for this one
+            }
+            button.style.color = adaptiveTextColor; 
+        });
+
+        if (adminBrandTitle) {
+            adminBrandTitle.style.color = color;
+        }
+
+        // Apply accent color to specific section titles and labels
+        const sectionTitles = [
+            document.querySelector('#edit-menu-section h3'),
+            document.querySelector('#manage-categories-section h3'),
+            document.querySelector('#site-settings-section h3'),
+            document.querySelector('#manage-categories-section .md\\:w-1\\/3 > label') // Label for "Existing Categories"
+        ];
+
+        sectionTitles.forEach(titleElement => {
+            if (titleElement) titleElement.style.color = color;
+        });
+        // Active tab styling is handled by CSS variables or direct style in tab click handler
+    };
     // --- HELPER & RENDER FUNCTIONS ---
     const populateCategoryDropdown = (selectElement, selectedValue) => {
         selectElement.innerHTML = '';
@@ -129,54 +206,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span>${cat}</span>
                 <button data-category-name="${cat}" class="delete-category-btn text-red-600 hover:text-red-500 text-xs font-semibold uppercase">Remove</button>
             </div>`
-        ).join('');
-        // Only populate addItemCategorySelect if it exists (i.e., on add-item.html)
-        if (addItemCategorySelect) {
-            populateCategoryDropdown(addItemCategorySelect);
-        }
+        ).join('') || '<p class="text-gray-500">No categories yet. Add one!</p>';
+        // The modal's category select will be populated when the modal opens.
     };
 
+    // Store the index of the item being edited, null if adding new
+    let editingItemIndex = null; 
+    
     const renderAdminMenu = () => {
         if (!adminMenuList) return; // Only render if the list element exists
         adminMenuList.innerHTML = '';
-        const header = document.createElement('div');
-        header.className = 'hidden md:grid md:grid-cols-6 gap-4 items-center border-b-2 border-gray-300 pb-2 font-bold text-sm text-gray-500 uppercase tracking-wider';
-        header.innerHTML = `<span>Name</span><span>Category</span><span>Price</span><span>Dietary</span><span>Status</span><span>Action</span>`;
-        adminMenuList.appendChild(header);
+        // Desktop header
+        const desktopHeader = document.createElement('div');
+        desktopHeader.className = 'hidden md:grid md:grid-cols-6 gap-x-3 items-center border-b-2 border-gray-300 pb-2 font-bold text-sm text-gray-500 uppercase tracking-wider';
+        desktopHeader.innerHTML = `<span>Name</span><span>Category</span><span>Price</span><span>Dietary</span><span>Status</span><span class="text-right">Actions</span>`;
+        adminMenuList.appendChild(desktopHeader);
 
         if (!Array.isArray(menuData) || menuData.length === 0) return;
         menuData.forEach((item, index) => {
             const itemDiv = document.createElement('div');
-            itemDiv.className = 'grid grid-cols-1 md:grid-cols-6 gap-4 items-center border-b border-gray-300 py-4';
-            
-            const commonInputClasses = 'w-full px-3 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition';
+            // Adjusted grid for edit/delete buttons
+            // Mobile: 2 columns (info, actions). Desktop: 6 columns. Further reduced vertical padding.
+            itemDiv.className = 'grid grid-cols-[1fr_auto] md:grid-cols-6 gap-x-2 sm:gap-x-3 gap-y-1.5 sm:gap-y-1 items-center border-b border-gray-300 py-1 sm:py-2';
 
             itemDiv.innerHTML = `
-                <input type="text" value="${item.name}" data-index="${index}" data-field="name" class="${commonInputClasses}">
-                <div class="category-select-wrapper"></div>
-                <input type="number" step="0.01" value="${item.price}" data-index="${index}" data-field="price" class="${commonInputClasses}">
-                <div class="dietary-select-wrapper"></div>
-                <div class="status-select-wrapper"></div>
-                <div class="flex items-center justify-end">
-                    <button class="delete-btn bg-red-600 text-white text-xs font-bold uppercase px-3 py-2 rounded-md hover:bg-red-700 transition-colors" data-index="${index}">Delete</button>
+                <!-- Mobile: Combined info, Desktop: Separate spans -->
+                <div class="md:col-span-1"> <!-- Name for Desktop -->
+                    <span class="font-medium text-gray-700 text-sm sm:text-base">${item.name}</span>
+                    <div class="text-xs text-gray-500 md:hidden"> <!-- Category, Price for Mobile -->
+                        ${item.category} &bull; ₹${parseFloat(item.price).toFixed(2)} &bull; ${item.isVeg ? 'Veg' : 'Non-Veg'} &bull; <span class="${item.isAvailable ? 'text-green-500' : 'text-red-500'}">${item.isAvailable ? 'Available' : 'Unavailable'}</span>
+                    </div>
+                </div>
+                <span class="hidden md:inline-block text-gray-600 text-sm">${item.category}</span>
+                <span class="hidden md:inline-block text-gray-600 text-sm">₹${parseFloat(item.price).toFixed(2)}</span>
+                <span class="hidden md:inline-block text-gray-600 text-sm">${item.isVeg ? 'Veg' : 'Non-Veg'}</span>
+                <span class="hidden md:inline-block ${item.isAvailable ? 'text-green-600' : 'text-red-500'} text-sm font-semibold ">${item.isAvailable ? 'Available' : 'Unavailable'}</span>
+                <div class="flex items-center justify-end space-x-0.5 sm:space-x-1 md:col-span-1">
+                    <button class="edit-item-btn text-amber-600 hover:text-amber-500 p-1 sm:p-1.5 rounded hover:bg-amber-100 transition-colors" data-index="${index}" title="Edit Item">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                    </button>
+                    <button class="delete-item-btn text-red-600 hover:text-red-500 p-1 sm:p-1.5 rounded hover:bg-red-100 transition-colors" data-index="${index}" title="Delete Item">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
                 </div>
             `;
-
-            const categorySelect = document.createElement('select');
-            categorySelect.className = commonInputClasses; categorySelect.dataset.index = index; categorySelect.dataset.field = 'category';
-            populateCategoryDropdown(categorySelect, item.category);
-            itemDiv.querySelector('.category-select-wrapper').replaceWith(categorySelect);
-
-            const dietarySelect = document.createElement('select');
-            dietarySelect.className = commonInputClasses; dietarySelect.dataset.index = index; dietarySelect.dataset.field = 'isVeg';
-            dietarySelect.innerHTML = `<option value="true" ${item.isVeg ? 'selected' : ''}>Veg</option><option value="false" ${!item.isVeg ? 'selected' : ''}>Non-Veg</option>`;
-            itemDiv.querySelector('.dietary-select-wrapper').replaceWith(dietarySelect);
-
-            const availableSelect = document.createElement('select');
-            availableSelect.className = commonInputClasses; availableSelect.dataset.index = index; availableSelect.dataset.field = 'isAvailable';
-            availableSelect.innerHTML = `<option value="true" ${item.isAvailable ? 'selected' : ''}>Available</option><option value="false" ${!item.isAvailable ? 'selected' : ''}>Unavailable</option>`;
-            itemDiv.querySelector('.status-select-wrapper').replaceWith(availableSelect);
-
             adminMenuList.appendChild(itemDiv);
         });
     };
@@ -211,10 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Call render functions only if their target elements exist
             renderCategoryList();
             renderAdminMenu();
-            // If on add-item page, populate its category dropdown initially
-            if (addItemCategorySelect) {
-                populateCategoryDropdown(addItemCategorySelect);
-            }
+            await loadAndApplySiteSettings(); // Load site settings including accent color
             isMenuDirty = false; // Reset dirty flags after initial load
             isCategoriesDirty = false;
             updatePublishButtonState(); // Set initial state of publish button
@@ -229,31 +299,120 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- PAGE-SPECIFIC EVENT LISTENERS & LOGIC ---
-    // Ensure these are only attached if the elements exist on the current page
+    // --- MODAL LOGIC ---
+    const openItemModal = (index = null) => {
+        editingItemIndex = index;
+        const modalItemCategorySelect = document.getElementById('modal-item-category-select');
+        const modalItemName = document.getElementById('modal-item-name');
+        const modalItemDescription = document.getElementById('modal-item-description');
+        const modalItemPrice = document.getElementById('modal-item-price');
+        const modalItemDietarySelect = document.getElementById('modal-item-dietary-select');
+        const modalItemIsAvailableSelect = document.getElementById('modal-item-is-available-select');
+        const modalItemImage = document.getElementById('modal-item-image');
 
-    // For Edit Menu Page (edit-menu.html)
-    if (adminMenuList) {
-        adminMenuList.addEventListener('change', (e) => {
-            const index = e.target.dataset.index;
-            if (index === undefined) return;
-            const field = e.target.dataset.field;
-            let value = e.target.value;
-            if (field === 'isAvailable' || field === 'isVeg') { value = (e.target.value === 'true'); } 
-            else if (e.target.type === 'number') { value = parseFloat(e.target.value); }
-            menuData[index][field] = value;
+        if (index !== null && menuData[index]) { // Editing existing item
+            const item = menuData[index];
+            modalTitle.textContent = 'Edit Menu Item';
+            document.getElementById('modal-item-index').value = index;
+            modalItemName.value = item.name;
+            populateCategoryDropdown(modalItemCategorySelect, item.category);
+            modalItemDescription.value = item.description;
+            modalItemPrice.value = item.price;
+            modalItemDietarySelect.value = item.isVeg.toString();
+            modalItemIsAvailableSelect.value = item.isAvailable.toString();
+            modalItemImage.value = item.image || '';
+        } else { // Adding new item
+            modalItemForm.reset(); // Clear form only when adding a new item
+            modalTitle.textContent = 'Add New Menu Item';
+            document.getElementById('modal-item-index').value = '';
+            populateCategoryDropdown(modalItemCategorySelect); // Populate with no preselection
+        }
+        addItemModal.classList.remove('hidden');
+    };
+
+    const closeItemModal = () => {
+        addItemModal.classList.add('hidden');
+        editingItemIndex = null;
+    };
+
+    if (globalAddItemButton) {
+        globalAddItemButton.addEventListener('click', () => openItemModal());
+    }
+    if (modalCloseButton) modalCloseButton.addEventListener('click', closeItemModal);
+    if (modalCancelButton) modalCancelButton.addEventListener('click', closeItemModal);
+
+    // Handle click outside modal to close (optional)
+    if (addItemModal) {
+        addItemModal.addEventListener('click', (e) => {
+            if (e.target === addItemModal) { // Check if the click is on the backdrop itself
+                closeItemModal();
+            }
+        });
+    }
+
+    if (modalItemForm) {
+        modalItemForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('modal-item-name').value.trim();
+            const category = document.getElementById('modal-item-category-select').value;
+            const description = document.getElementById('modal-item-description').value.trim();
+            const price = parseFloat(document.getElementById('modal-item-price').value);
+            const isVeg = document.getElementById('modal-item-dietary-select').value === 'true';
+            const isAvailable = document.getElementById('modal-item-is-available-select').value === 'true';
+            let image = document.getElementById('modal-item-image').value.trim();
+
+            if (!name || !category || !description || isNaN(price) || price < 0) {
+                showToast('Please fill all required fields correctly.', 'error');
+                return;
+            }
+            if (!image) { // Default placeholder if image is empty
+                image = `https://placehold.co/600x400/333333/FBBF24?text=${encodeURIComponent(name)}`;
+            }
+
+            const itemData = { name, category, description, price, isVeg, isAvailable, image };
+
+            if (editingItemIndex !== null) { // Update existing
+                menuData[editingItemIndex] = { ...menuData[editingItemIndex], ...itemData };
+                showToast(`Item "${name}" updated. Publish to save.`, 'info');
+            } else { // Add new
+                menuData.push(itemData);
+                showToast(`Item "${name}" added. Publish to save.`, 'info');
+            }
             isMenuDirty = true;
             updatePublishButtonState();
+            renderAdminMenu();
+            closeItemModal();
         });
+    }
 
+    // Event listener for Edit/Delete buttons on menu items
+    if (adminMenuList) {
         adminMenuList.addEventListener('click', (e) => {
-            if (e.target.classList.contains('delete-btn')) {
-                const index = e.target.dataset.index;
-                if (confirm(`Delete "${menuData[index].name}"?`)) {
+            const deleteButton = e.target.closest('.delete-item-btn');
+            const editButton = e.target.closest('.edit-item-btn');
+
+            if (deleteButton) {
+                const index = deleteButton.dataset.index;
+                if (confirm(`Are you sure you want to delete "${menuData[index].name}"?`)) {
                     menuData.splice(index, 1);
-                    renderAdminMenu();
+                    renderAdminMenu(); // Re-render the list
                     isMenuDirty = true;
                     updatePublishButtonState();
+                    showToast('Item deleted. Publish to save changes.', 'info');
+                }
+            } else if (editButton) {
+                const indexString = editButton.dataset.index;
+                if (typeof indexString === 'string' && indexString.length > 0) {
+                    const index = parseInt(indexString, 10); // Always specify radix 10
+                    if (!isNaN(index)) {
+                        openItemModal(index); // Open modal for editing
+                    } else {
+                        console.error("Failed to parse index for edit. Original data-index:", indexString);
+                        showToast("Error: Could not edit item due to invalid item identifier.", "error");
+                    }
+                } else {
+                    console.error("Failed to get valid index string for edit. data-index was:", indexString, "on button:", editButton);
+                    showToast("Error: Could not edit item. Missing item identifier.", "error");
                 }
             }
         });
@@ -334,40 +493,92 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // For Add Item Page (add-item.html)
-    if (addItemForm) {
-        addItemForm.addEventListener('submit', (e) => { // No longer needs to be async
-            e.preventDefault();
-            const newName = document.getElementById('item-name').value;
-            const newCategory = addItemCategorySelect ? addItemCategorySelect.value : ''; 
-            const newDescription = document.getElementById('item-description').value;
-            const newPrice = parseFloat(document.getElementById('item-price').value);
-            const newIsVeg = addItemDietarySelect ? addItemDietarySelect.value === 'true' : true; 
+    // --- SITE SETTINGS LOGIC ---
+    const loadAndApplySiteSettings = async () => {
+        try {
+            const response = await fetch('/.netlify/functions/settings');
+            if (!response.ok) throw new Error('Failed to fetch site settings.');
+            const settings = await response.json();
+            if (settings.accentColor && accentColorPicker && accentColorHexInput) {
+                accentColorPicker.value = settings.accentColor;
+                accentColorHexInput.value = settings.accentColor;
+            }
+            if (settings.announcementText !== undefined && announcementTextInput) {
+                announcementTextInput.value = settings.announcementText;
+            }
+            if (settings.announcementEnabled !== undefined && enableAnnouncementCheckbox) {
+                enableAnnouncementCheckbox.checked = settings.announcementEnabled;
+            }
+            if (settings.sectionTitleFont !== undefined && sectionTitleFontSelect) {
+                sectionTitleFontSelect.value = settings.sectionTitleFont;
+            }
+            // Pass the full settings object or individual font setting to applyAccentColorToAdmin
+            // For simplicity, applyAccentColorToAdmin will now read from sectionTitleFontSelect directly
+            // or we can pass it. Let's ensure it's available when called.
+            // The call below will now also apply the font.
+            applyAccentColorToAdmin(settings.accentColor, settings.accentColorHover); 
+        } catch (error) {
+            console.error("Error loading site settings:", error);
+            showToast('Could not load site settings.', 'error');
+        }
+    };
 
-            if (!newName || !newCategory || !newDescription || isNaN(newPrice)) {
-                showToast('Please fill out all fields correctly to add an item.', 'error');
+    // Ensure site settings are loaded which includes announcement fields
+
+    if (siteSettingsForm && accentColorPicker && accentColorHexInput) {
+        accentColorPicker.addEventListener('input', (e) => {
+            accentColorHexInput.value = e.target.value;
+        });
+        accentColorHexInput.addEventListener('input', (e) => {
+            if (/^#[0-9A-F]{6}$/i.test(e.target.value) || /^#[0-9A-F]{3}$/i.test(e.target.value)) {
+                accentColorPicker.value = e.target.value;
+            }
+        });
+
+        siteSettingsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newAccentColor = accentColorHexInput.value;
+            const announcementText = announcementTextInput ? announcementTextInput.value : '';
+            const announcementEnabled = enableAnnouncementCheckbox ? enableAnnouncementCheckbox.checked : false;
+            const sectionTitleFont = sectionTitleFontSelect ? sectionTitleFontSelect.value : "'Playfair Display', serif";
+
+            if (!newAccentColor || !/^#[0-9A-F]{6}$/i.test(newAccentColor)) {
+                showToast('Please enter a valid 6-digit hex color (e.g., #F59E0B).', 'error');
                 return;
             }
 
-            const newItem = { 
-                name: newName, 
-                description: newDescription, 
-                price: newPrice, 
-                category: newCategory, 
-                isAvailable: true, // Default to available
-                isVeg: newIsVeg, 
-                image: `https://placehold.co/600x400/333333/FBBF24?text=${encodeURIComponent(newName)}` // Use encodeURIComponent
+            const settingsToSave = {
+                accentColor: newAccentColor,
+                announcementText: announcementText,
+                announcementEnabled: announcementEnabled,
+                sectionTitleFont: sectionTitleFont
             };
-            menuData.push(newItem);
-            showToast(`Item "${newName}" added. Publish to save changes.`, 'info');
-            isMenuDirty = true; updatePublishButtonState();
-            // After successfully saving, re-render the menu list
-            // to reflect the newly added item in the "Update Menu" tab.
-            if (adminMenuList) renderAdminMenu();
-            e.target.reset();
-            if (addItemCategorySelect) populateCategoryDropdown(addItemCategorySelect); // Repopulate to reset selection
+
+            try {
+                const response = await fetch('/.netlify/functions/settings', {
+                    method: 'POST', // Body will now include announcement settings
+                    body: JSON.stringify(settingsToSave) 
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message || 'Failed to save accent color.');
+                                
+                // Use the message from the server, which indicates if GitHub save was successful
+                // and determine toast type based on whether the write to GitHub was successful (if not local dev)
+                const toastType = result.writeAttemptedOnServer && !result.writeSuccessfulOnServer ? 'info' : 'success';
+                showToast(result.message, toastType); 
+
+                // Always apply to current session for immediate feedback
+                if (result.settings) {
+                    // applyAccentColorToAdmin will be called, and it will pick up the
+                    // new font from sectionTitleFontSelect if it was part of result.settings
+                    // and updated the select's value.
+                    applyAccentColorToAdmin(result.settings.accentColor, result.settings.accentColorHover);
+                }
+            } catch (error) {
+                showToast(`Error saving accent color: ${error.message}`, 'error');
+                console.error("Error saving accent color:", error);
+            }
         });
     }
-
     loadInitialData();
 });

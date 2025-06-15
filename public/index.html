@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virindhu Mane - Flavors of Madurai</title>
+    <title>Virundhu Mane - Flavors of Madurai</title>
     <link rel="icon" type="image/png" href="/icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&family=Merriweather:wght@700&family=Lato:wght@400;700&family=Lobster&family=Pacifico&family=Dancing+Script:wght@700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
     
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -16,75 +16,96 @@
 
     <script src="/js/main.js" defer></script>
     <style>
-        /* Base styles are minimal; Tailwind handles the rest */
-        body {
-            font-family: 'Roboto', sans-serif; /* Default font */
-            /* background-color can be managed by Tailwind, or set to a light color here if preferred */
-            /* e.g., background-color: #f9fafb; for a very light gray */
-        }
+        /* Page-specific font */
         .hero-bg {
-            background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url('https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=2070&auto=format&fit=crop'); /* Light overlay */
+            background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url('https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=2070&auto-format&fit=crop'); /* Light overlay */
             background-size: cover;
             background-position: center;
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 scroll-smooth">
+<body class="scroll-smooth bg-theme-primary text-theme-primary">
+    <!-- Global body background and text color are now handled by src/input.css -->
+    <!-- Page-specific font-family applied via inline style to ensure it takes precedence if needed -->
 
-    <header class="bg-white shadow-sm sticky top-0 z-40 h-24 flex items-center">
+    <!-- Announcement Bar -->
+    <div id="announcement-bar" class="hidden p-3 text-center text-sm relative z-50">
+        <span id="announcement-text-display" class="mr-6"></span>
+        <button id="close-announcement-button" aria-label="Close announcement" class="absolute top-1/2 right-3 -translate-y-1/2 text-xl leading-none font-semibold hover:text-amber-200">&times;</button>
+    </div>
+
+
+    <header class="shadow-sm sticky top-0 z-40 h-[6.5rem] sm:h-24 flex items-center header-themed">
         <div class="container mx-auto px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between">
-            <div class="text-center sm:text-left mb-2 sm:mb-0">
-                <h1 class="font-brand text-3xl md:text-4xl font-bold text-amber-500 cursor-pointer" data-page="menu">Virundhu Mane</h1>
-                <p class="text-sm text-gray-500">Flavors of Madurai</p>
+            <div class="text-center sm:text-left mb-2 sm:mb-0 pt-3 sm:pt-0">
+                <h1 class="font-brand text-3xl md:text-4xl font-bold text-theme-accent cursor-pointer" data-page="menu">Virundhu Mane</h1>
+                <p class="text-sm text-theme-secondary">Flavors of Madurai</p>
             </div>
-            <nav id="main-nav" class="flex space-x-4 md:space-x-6">
-                <a href="#menu" data-page="menu" class="nav-link text-gray-700 hover:text-amber-500 font-semibold px-2 py-1">Menu</a>
-                <a href="#about" data-page="about" class="nav-link text-gray-700 hover:text-amber-500 font-semibold px-2 py-1">About Us</a>
-                <a href="#faq" data-page="faq" class="nav-link text-gray-700 hover:text-amber-500 font-semibold px-2 py-1">FAQ</a>
-            </nav>
+            <div class="flex items-center space-x-4 md:space-x-6">
+                <nav id="main-nav" class="flex space-x-4 md:space-x-6">
+                    <!-- 
+                        Note: font-semibold is now part of .nav-link-themed.active 
+                        If all nav links should be font-semibold, add it directly.
+                    -->
+                    <a href="#menu" data-page="menu" class="nav-link-themed px-2 py-1 font-semibold">Menu</a>
+                    <a href="#about" data-page="about" class="nav-link-themed px-2 py-1 font-semibold">About Us</a>
+                    <a href="#faq" data-page="faq" class="nav-link-themed px-2 py-1 font-semibold">FAQ</a>
+                </nav>
+                <button id="theme-toggle-button" class="p-2 rounded-full transition-colors" aria-label="Toggle theme">
+                    <svg id="theme-icon-light" class="h-6 w-6 text-amber-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                    <svg id="theme-icon-dark" class="h-6 w-6 text-amber-500 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                </button>
+            </div>
         </div>
     </header>
 
     <!-- Menu Section (Default Visible) -->
-    <section id="menu-content" class="page-content py-12 md:py-16">
+    <section id="menu-content" class="page-content py-6 md:py-16">
         <div class="container mx-auto px-6 lg:px-8">
-            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-amber-400 mb-10">Discover Our Menu</h2>
-            
-            <div class="flex flex-row justify-center items-center my-8 space-x-6 sm:space-x-8">
-                 <div class="flex items-center space-x-2">
-                    <span class="font-semibold text-md text-green-600">Veg</span>
-                    <div id="veg-only-switch" class="relative w-12 h-6 flex items-center bg-gray-200 rounded-full p-0.5 cursor-pointer transition-colors duration-300 ease-in-out" data-filter-type="veg">
-                        <div id="veg-only-knob" class="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
-                    </div>
-                 </div>
-                 <div class="flex items-center space-x-2">
-                    <span class="font-semibold text-md text-red-600">Non-Veg</span>
-                    <div id="non-veg-only-switch" class="relative w-12 h-6 flex items-center bg-gray-200 rounded-full p-0.5 cursor-pointer transition-colors duration-300 ease-in-out" data-filter-type="non-veg">
-                        <div id="non-veg-only-knob" class="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
-                    </div>
-                 </div>
-            </div>
-
-            <!-- Sticky Tab Bar Container - Positioned below the header (h-24 = 6rem) -->
-            <div class="sticky top-24 z-30 bg-gray-50 py-3 shadow-sm -mx-6 px-6 border-b border-gray-300 mb-8">
-                <div id="category-tabs" class="container mx-auto flex flex-wrap justify-center gap-x-3 sm:gap-x-6 md:gap-x-8">
-                    <!-- Category tabs will be dynamically inserted here by main.js -->
+            <div class="flex flex-row items-center justify-between mb-4 sm:mb-8">
+                <h2 class="font-brand text-md sm:text-xl md:text-2xl font-bold text-theme-accent text-left mb-0 mr-3">Discover Our Menu</h2>
+                <div class="flex items-center space-x-3">
+                     <div class="flex items-center space-x-2">
+                        <span class="font-semibold text-xs sm:text-sm text-green-600 dark:text-green-400">Veg</span>
+                        <div id="veg-only-switch" class="relative w-8 h-4 flex items-center bg-gray-300 dark:bg-gray-600 rounded-full p-0.5 cursor-pointer transition-colors duration-300 ease-in-out" data-filter-type="veg">
+                            <div id="veg-only-knob" class="bg-white w-3 h-3 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
+                        </div>
+                     </div>
+                     <div class="flex items-center space-x-2">
+                        <span class="font-semibold text-xs sm:text-sm text-red-600 dark:text-red-400">Non-Veg</span>
+                        <div id="non-veg-only-switch" class="relative w-8 h-4 flex items-center bg-gray-300 dark:bg-gray-600 rounded-full p-0.5 cursor-pointer transition-colors duration-300 ease-in-out" data-filter-type="non-veg">
+                            <div id="non-veg-only-knob" class="bg-white w-3 h-3 rounded-full shadow-md transform transition-transform duration-300 ease-in-out"></div>
+                        </div>
+                     </div>
                 </div>
             </div>
 
+            <!-- Sticky Tab Bar Container - Positioned below the header (h-24 = 6rem) -->
+            <div id="sticky-category-bar-wrapper" class="sticky top-24 z-30 py-2 sm:py-3 shadow-sm -mx-6 px-6 border-b mb-8 bg-theme-primary border-theme">
+                <button id="scroll-cat-left" aria-label="Scroll categories left" class="absolute left-1 top-1/2 -translate-y-1/2 z-10 p-2 bg-theme-primary rounded-full hidden text-theme-accent transition-opacity duration-200">
+                    <i class="fas fa-chevron-left fa-fw"></i>
+                </button>
+                <div id="category-tabs" class="flex overflow-x-auto whitespace-nowrap justify-start gap-x-4 sm:gap-x-6">
+                    <!-- Category tabs will be dynamically inserted here by main.js -->
+                </div>
+                <button id="scroll-cat-right" aria-label="Scroll categories right" class="absolute right-1 top-1/2 -translate-y-1/2 z-10 p-2 bg-theme-primary rounded-full hidden text-theme-accent transition-opacity duration-200">
+                    <i class="fas fa-chevron-right fa-fw"></i>
+                </button>
+            </div>
+
             <!-- Menu Grid - Now outside the sticky container -->
-            <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 <!-- Menu items will be dynamically inserted here by main.js -->
             </div>
-            <p id="no-items-message" class="text-center text-gray-500 mt-8 text-xl hidden">No items found matching your selection.</p>
+            <p id="no-items-message" class="text-center text-theme-secondary mt-8 text-xl hidden">No items found matching your selection.</p>
         </div>
     </section>
 
     <!-- About Us Section (Hidden by default) -->
-    <section id="about-content" class="page-content hidden py-12 md:py-16 bg-white scroll-mt-24">
+    <section id="about-content" class="page-content hidden py-12 md:py-16 bg-theme-secondary scroll-mt-24">
         <div class="container mx-auto px-6 lg:px-8">
-            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-amber-400 mb-10">About Virundhu Mane</h2>
-            <div class="max-w-3xl mx-auto text-gray-700 space-y-6 leading-relaxed text-lg">
+            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-theme-accent mb-10">About Virundhu Mane</h2>
+            <div class="max-w-3xl mx-auto text-gray-700 space-y-6 leading-relaxed text-lg"> <!-- text-gray-700 might need to be text-theme-secondary -->
                 <p>Welcome to Virundhu Mane, where we bring the authentic, rich, and diverse flavors of Madurai right to your plate. Our culinary journey is a tribute to the legendary hospitality and vibrant food culture of one of Tamil Nadu's most ancient cities.</p>
                 <p>At Virundhu Mane, we believe that food is an experience, a celebration of tradition and taste. Our chefs meticulously prepare each dish using time-honored recipes and the freshest locally-sourced ingredients, ensuring a delightful gastronomic adventure with every bite.</p>
                 <p>Join us to savor the essence of Madurai's heritage, served with warmth and a commitment to excellence.</p>
@@ -95,33 +116,33 @@
     <!-- FAQ Section (Hidden by default) -->
     <section id="faq-content" class="page-content hidden py-12 md:py-16 scroll-mt-24">
         <div class="container mx-auto px-6 lg:px-8">
-            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-amber-400 mb-10">Frequently Asked Questions</h2>
+            <h2 class="font-brand text-3xl md:text-4xl font-bold text-center text-theme-accent mb-10">Frequently Asked Questions</h2>
             <div id="faq-accordion" class="max-w-2xl mx-auto space-y-4">
                 <!-- FAQ items will be dynamically inserted here by main.js -->
-                <div class="text-center text-gray-500">Loading FAQs...</div>
+                <div class="text-center text-theme-secondary">Loading FAQs...</div>
             </div>
         </div>
     </section>
 
 
-    <footer class="bg-gray-800 py-8 text-gray-300">
+    <footer class="py-10 border-t border-theme bg-theme-secondary text-theme-secondary">
         <div class="container mx-auto px-6 lg:px-8 text-center">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                 <div>
-                    <h5 class="font-semibold text-lg text-amber-400 mb-2">Visit Us</h5>
-                    <p class="text-gray-400">123 Spice Street, Madurai, Tamil Nadu 625001</p>
+                    <h5 class="font-semibold text-lg text-theme-accent mb-2">Visit Us</h5>
+                    <p class="text-gray-400">3J3W+V36, Narayanapura, Bengaluru, Karnataka 560077, India</p>
                 </div>
                 <div>
-                    <h5 class="font-semibold text-lg text-amber-400 mb-2">Contact</h5>
-                    <p class="text-gray-400">Phone: <a href="tel:+919876543210" class="hover:text-amber-300">+91 98765 43210</a></p>
+                    <h5 class="font-semibold text-lg text-theme-accent mb-2">Contact</h5>
+                    <p>Phone: <a href="tel:+919876543210" class="hover:text-amber-300">+91 98765 43210</a></p>
                 </div>
                 <div>
-                    <h5 class="font-semibold text-lg text-amber-400 mb-2">Hours</h5>
-                    <p class="text-gray-400">Mon - Sun: 8:00 AM - 10:00 PM</p>
-                    <p class="text-gray-400 text-sm">(Breakfast: 8-11 AM | Lunch: 12-3 PM | Dinner: 6-10 PM)</p>
+                    <h5 class="font-semibold text-lg text-theme-accent mb-2">Hours</h5>
+                    <p>Mon - Sun: 8:00 AM - 10:00 PM</p>
+                    <p class="text-sm">(Breakfast: 8-11 AM | Lunch: 12-3 PM | Dinner: 6-10 PM)</p>
                 </div>
             </div>
-            <p class="text-gray-500 text-sm">&copy; <span id="current-year"></span> Virundhu Mane. All Rights Reserved.</p>
+            <p class="text-sm">&copy; <span id="current-year"></span> Virundhu Mane. All Rights Reserved.</p>
         </div>
     </footer>
 
