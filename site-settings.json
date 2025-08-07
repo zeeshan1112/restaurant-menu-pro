@@ -1,7 +1,7 @@
 {
   "accentColor": "#513de6",
   "announcementText": "Prices are increasing from 1 July!",
-  "announcementEnabled": true,
+  "announcementEnabled": false,
   "sectionTitleFont": "'Roboto', sans-serif",
   "accentColorHover": "#4836cf"
 }
